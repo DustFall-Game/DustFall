@@ -5,42 +5,42 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "DustFall/UI/Interface/PlayerToUIInterface.h"
-#include "DustFall/UI/Widgets/BaseUserWidget/DF_BaseUserWidget.h"
-#include "DF_UIManager.generated.h"
+#include "DustFall/UI/Widgets/BaseUserWidget/BaseUserWidget.h"
+#include "UIManager.generated.h"
 
 
 class UInputMappingContext;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class DUSTFALL_API UDF_UIManager : public UActorComponent, public IPlayerToUIInterface
+class DUSTFALL_API UUIManager : public UActorComponent, public IPlayerToUIInterface
 {
 	GENERATED_BODY()
 
 public:
-	UDF_UIManager();
+	UUIManager();
 	
 	/** Interfaces */
-	UDF_BaseUserWidget* GetUI_Implementation(FName WidgetName) override;
-	bool ShowUI_Implementation(TSubclassOf<UDF_BaseUserWidget> WidgetClass) override;
+	UBaseUserWidget* GetUI_Implementation(FName WidgetName) override;
+	bool ShowUI_Implementation(TSubclassOf<UBaseUserWidget> WidgetClass) override;
 	void HandleEscape_Implementation() override;
 
 protected:
 	virtual void BeginPlay() override;
 	void SetInputSettings(bool bIsUIActive);
-	void ChangeVisibilityWidget(UDF_BaseUserWidget* Widget);
-	UDF_BaseUserWidget* GetActivityWidgetByClass(TSubclassOf<UDF_BaseUserWidget> WidgetClass);
+	void ChangeVisibilityWidget(UBaseUserWidget* Widget);
+	UBaseUserWidget* GetActivityWidgetByClass(TSubclassOf<UBaseUserWidget> WidgetClass);
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI")
-	TSubclassOf<UDF_BaseUserWidget> PauseMenuWidget;
+	TSubclassOf<UBaseUserWidget> PauseMenuWidget;
 
 	UPROPERTY()
-	UDF_BaseUserWidget* ActivityWidget;
+	UBaseUserWidget* ActivityWidget;
 
 	UPROPERTY()
 	APlayerController* PlayerController;
 	
 	UPROPERTY()
-	TMap<FName, UDF_BaseUserWidget*> Widgets;
+	TMap<FName, UBaseUserWidget*> Widgets;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputMappingContext* MainInputMappingContext;

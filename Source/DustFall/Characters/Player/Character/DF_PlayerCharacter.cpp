@@ -3,14 +3,14 @@
 
 #include "DF_PlayerCharacter.h"
 
-#include "DustFall/Characters/Player/Components/Ability/DF_AbilityComponent.h"
+#include "DustFall/Characters/Player/Components/Ability/AbilityComponent.h"
 
 
 ADF_PlayerCharacter::ADF_PlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	AbilityComponent = FindComponentByClass<UDF_AbilityComponent>();
+	AbilityComponent = FindComponentByClass<UAbilityComponent>();
 }
 
 void ADF_PlayerCharacter::HandleCrouch_Implementation(bool bIsNewCrouch)

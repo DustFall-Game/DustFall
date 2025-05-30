@@ -6,7 +6,7 @@
 #include "UObject/Interface.h"
 #include "PlayerToUIInterface.generated.h"
 
-class UDF_BaseUserWidget;
+class UBaseUserWidget;
 // This class does not need to be modified.
 UINTERFACE()
 class UPlayerToUIInterface : public UInterface
@@ -23,10 +23,10 @@ class DUSTFALL_API IPlayerToUIInterface
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Interfaces")
-	UDF_BaseUserWidget* GetUI(FName WidgetName);
+	UBaseUserWidget* GetUI(FName WidgetName);
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Interfaces")
-	bool ShowUI(TSubclassOf<UDF_BaseUserWidget> WidgetClass);
+	bool ShowUI(TSubclassOf<UBaseUserWidget> WidgetClass);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Interfaces")
 	void HandleEscape();

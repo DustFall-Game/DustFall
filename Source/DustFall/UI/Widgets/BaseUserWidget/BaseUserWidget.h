@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "DF_BaseUserWidget.generated.h"
+#include "BaseUserWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DUSTFALL_API UDF_BaseUserWidget : public UUserWidget
+class DUSTFALL_API UBaseUserWidget : public UUserWidget
 {
 	GENERATED_BODY()
 

@@ -1,20 +1,20 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "DF_UIManager.h"
+#include "UIManager.h"
 
 #include "EnhancedInputSubsystems.h"
 #include "Blueprint/UserWidget.h"
 
 
-UDF_UIManager::UDF_UIManager()
+UUIManager::UUIManager()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-UDF_BaseUserWidget* UDF_UIManager::GetUI_Implementation(FName WidgetName)
+UBaseUserWidget* UUIManager::GetUI_Implementation(FName WidgetName)
 {
-	if (UDF_BaseUserWidget** FoundWidget = Widgets.Find(WidgetName))
+	if (UBaseUserWidget** FoundWidget = Widgets.Find(WidgetName))
 	{
 		return *FoundWidget;
 	}
@@ -22,7 +22,7 @@ UDF_BaseUserWidget* UDF_UIManager::GetUI_Implementation(FName WidgetName)
 	return nullptr;
 }
 
-void UDF_UIManager::BeginPlay()
+void UUIManager::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -31,11 +31,11 @@ void UDF_UIManager::BeginPlay()
 	PlayerController = Cast<APlayerController>(GetOwner());
 }
 
-bool UDF_UIManager::ShowUI_Implementation(TSubclassOf<UDF_BaseUserWidget> WidgetClass)
+bool UUIManager::ShowUI_Implementation(TSubclassOf<UBaseUserWidget> WidgetClass)
 {
 	if (!WidgetClass) return false;
 
-	UDF_BaseUserWidget* Widget = GetActivityWidgetByClass(WidgetClass);
+	UBaseUserWidget* Widget = GetActivityWidgetByClass(WidgetClass);
 
 	if (Widget)
 	{
@@ -60,7 +60,7 @@ bool UDF_UIManager::ShowUI_Implementation(TSubclassOf<UDF_BaseUserWidget> Widget
 		return true;
 	}
 	
-	auto NewWidget = CreateWidget<UDF_BaseUserWidget>(PlayerController, WidgetClass);
+	auto NewWidget = CreateWidget<UBaseUserWidget>(PlayerController, WidgetClass);
 	if (!NewWidget) return false;
 
 	NewWidget->AddToViewport();
@@ -75,7 +75,7 @@ bool UDF_UIManager::ShowUI_Implementation(TSubclassOf<UDF_BaseUserWidget> Widget
 	return true;
 }
 
-void UDF_UIManager::HandleEscape_Implementation()
+void UUIManager::HandleEscape_Implementation()
 {
 	if (ActivityWidget && ActivityWidget->bCanClose)
 	{
@@ -88,7 +88,7 @@ void UDF_UIManager::HandleEscape_Implementation()
 	
 	if (!PauseMenuWidget) return;
 
-	UDF_BaseUserWidget* PauseWidget = GetActivityWidgetByClass(PauseMenuWidget);
+	UBaseUserWidget* PauseWidget = GetActivityWidgetByClass(PauseMenuWidget);
 
 	if (PauseWidget)
 	{
@@ -99,7 +99,7 @@ void UDF_UIManager::HandleEscape_Implementation()
 	}
 	else
 	{
-		auto NewPauseWidget = CreateWidget<UDF_BaseUserWidget>(PlayerController, PauseMenuWidget);
+		auto NewPauseWidget = CreateWidget<UBaseUserWidget>(PlayerController, PauseMenuWidget);
 		if (NewPauseWidget)
 		{
 			NewPauseWidget->AddToViewport();
@@ -110,7 +110,7 @@ void UDF_UIManager::HandleEscape_Implementation()
 	}
 }
 
-void UDF_UIManager::ChangeVisibilityWidget(UDF_BaseUserWidget* Widget)
+void UUIManager::ChangeVisibilityWidget(UBaseUserWidget* Widget)
 {
 	if (!IsValid(Widget)) return;
 
@@ -119,11 +119,11 @@ void UDF_UIManager::ChangeVisibilityWidget(UDF_BaseUserWidget* Widget)
 	SetInputSettings(!bVisible);
 }
 
-UDF_BaseUserWidget* UDF_UIManager::GetActivityWidgetByClass(TSubclassOf<UDF_BaseUserWidget> WidgetClass)
+UBaseUserWidget* UUIManager::GetActivityWidgetByClass(TSubclassOf<UBaseUserWidget> WidgetClass)
 {
-	for (const TPair<FName, UDF_BaseUserWidget*>& Pair : Widgets)
+	for (const TPair<FName, UBaseUserWidget*>& Pair : Widgets)
 	{
-		UDF_BaseUserWidget* Widget = Pair.Value;
+		UBaseUserWidget* Widget = Pair.Value;
 		if (IsValid(Widget) && Widget->GetClass() == WidgetClass)
 		{
 			return Widget;
@@ -132,7 +132,7 @@ UDF_BaseUserWidget* UDF_UIManager::GetActivityWidgetByClass(TSubclassOf<UDF_Base
 	return nullptr;
 }
 
-void UDF_UIManager::SetInputSettings(bool bIsUIActive)
+void UUIManager::SetInputSettings(bool bIsUIActive)
 {
 	if (!PlayerController) return;
 

@@ -5,16 +5,16 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "DustFall/Characters/Player/Interfaces/InputToPlayer/InputToPlayerInterface.h"
-#include "DF_AbilityComponent.generated.h"
+#include "AbilityComponent.generated.h"
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class DUSTFALL_API UDF_AbilityComponent : public UActorComponent, public IInputToPlayerInterface
+class DUSTFALL_API UAbilityComponent : public UActorComponent, public IInputToPlayerInterface
 {
 	GENERATED_BODY()
 
 public:
-	UDF_AbilityComponent();
+	UAbilityComponent();
 
 	/** Implements */
 	virtual void HandleSprint_Implementation(bool bIsSprint) override;

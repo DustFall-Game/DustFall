@@ -7,7 +7,7 @@
 #include "GameFramework/Character.h"
 #include "DF_PlayerCharacter.generated.h"
 
-class UDF_AbilityComponent;
+class UAbilityComponent;
 
 UCLASS()
 class DUSTFALL_API ADF_PlayerCharacter : public ACharacter, public IInputToPlayerInterface
@@ -23,5 +23,5 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY()
-	UDF_AbilityComponent* AbilityComponent;
+	UAbilityComponent* AbilityComponent;
 };

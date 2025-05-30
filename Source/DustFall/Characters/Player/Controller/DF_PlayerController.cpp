@@ -4,9 +4,9 @@
 #include "DF_PlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "DustFall/Characters/Player/Components/Ability/DF_AbilityComponent.h"
+#include "DustFall/Characters/Player/Components/Ability/AbilityComponent.h"
 #include "DustFall/Characters/Player/Interfaces/InputToPlayer/InputToPlayerInterface.h"
-#include "DustFall/UI/Manager/DF_UIManager.h"
+#include "DustFall/UI/Manager/UIManager.h"
 #include "GameFramework/Character.h"
 
 void ADF_PlayerController::BeginPlay()
@@ -17,10 +17,10 @@ void ADF_PlayerController::BeginPlay()
 	
 	if (ControlledCharacter)
 	{
-		AbilityComponent = ControlledCharacter->FindComponentByClass<UDF_AbilityComponent>();
+		AbilityComponent = ControlledCharacter->FindComponentByClass<UAbilityComponent>();
 	}
 
-	UIManager = FindComponentByClass<UDF_UIManager>();
+	UIManager = FindComponentByClass<UUIManager>();
 	
 	if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
 	{
