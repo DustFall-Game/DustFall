@@ -181,10 +181,6 @@
 			"Enabled": false
 		},
 		{
-			"Name": "SteamSockets",
-			"Enabled": true
-		},
-		{
 			"Name": "OnlineSubsystemSteam",
 			"Enabled": true
 		},
@@ -202,6 +198,10 @@
 			"Name": "NIS",
 			"Enabled": true,
 			"MarketplaceURL": "https://www.unrealengine.com/marketplace/en-US/product/nvidia-dlss"
+		},
+		{
+			"Name": "SteamSockets",
+			"Enabled": true
 		}
 	]
 }

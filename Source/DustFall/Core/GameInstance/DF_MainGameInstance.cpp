@@ -118,12 +118,22 @@ UFindSessionsCallbackProxyAdvanced* UDF_MainGameInstance::AdvancedFindSessions(c
 
 void UDF_MainGameInstance::OnCreateSessionSuccess()
 {
+	GEngine->AddOnScreenDebugMessage(
+	-1,
+	15.0f,
+	FColor::Green,
+	TEXT("Открытие карты"));
+	
 	GetWorld()->ServerTravel(TEXT("/Game/Maps/MainMenuMap?listen"), true);
 }
 
 void UDF_MainGameInstance::OnCreateSessionFailure()
 {
-	UE_LOG(LogTemp, Error, TEXT("Не удалось создать сессию."));
+	GEngine->AddOnScreenDebugMessage(
+		-1,
+		15.0f,
+		FColor::Red,
+		TEXT("Не удалось создать сессию."));
 }
 
 void UDF_MainGameInstance::AdvancedJoinSession(const FString& SessionName, const int32& SessionIndex)
@@ -151,6 +161,12 @@ void UDF_MainGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessi
 		APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 		if (PC)
 		{
+			GEngine->AddOnScreenDebugMessage(
+			-1,
+			15.0f,
+			FColor::Green,
+			TEXT("Connect"));
+			
 			PC->ClientTravel(ConnectString, ETravelType::TRAVEL_Absolute);
 		}
 	}
