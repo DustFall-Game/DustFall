@@ -6,6 +6,7 @@
 #include "SettingItemWidget.h"
 #include "SettingItem_CheckBox.generated.h"
 
+class UCheckBox;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCheckBoxChanged, bool, value);
 
 /**
@@ -16,24 +17,19 @@ class DUSTFALL_API USettingItem_CheckBox : public USettingItemWidget
 {
 	GENERATED_BODY()
 
-protected:
-	UPROPERTY(meta = (BindWidget))
-	class UCheckBox* CheckBox;
-
-	virtual void NativeConstruct() override;
-
-	virtual void NativePreConstruct() override;
-
-
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnCheckBoxChanged OnCheckBoxChanged;
 	
-	UFUNCTION()
 	void SetValue(bool value);
-
-	UFUNCTION()
 	bool GetValue();
+	
+protected:
+	UPROPERTY(meta = (BindWidget))
+	UCheckBox* CheckBox;
+
+	virtual void NativeConstruct() override;
+	virtual void NativePreConstruct() override;
 
 private:
 	UFUNCTION()

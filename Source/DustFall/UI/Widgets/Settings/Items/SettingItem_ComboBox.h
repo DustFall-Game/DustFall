@@ -10,6 +10,7 @@
  * 
  */
 
+class UComboBoxString;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnComboBoxSelectionChanged, const FString&, SelectedItem);
 
 UCLASS()
@@ -17,24 +18,20 @@ class DUSTFALL_API USettingItem_ComboBox : public USettingItemWidget
 {
 	GENERATED_BODY()
 
-protected:
-	UPROPERTY(meta = (BindWidget))
-	class UComboBoxString* ComboBox;
-
-	virtual void NativeConstruct() override;
-
-	virtual void NativePreConstruct() override;
-	
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnComboBoxSelectionChanged OnSelectionChanged;
 	
-	UFUNCTION()
 	void SetItems(TArray<FString> ItemsSource);
-
-	UFUNCTION()
 	void SetDefaultValue(FString SelectedItem);
+	
+protected:
+	UPROPERTY(meta = (BindWidget))
+	UComboBoxString* ComboBox;
 
+	virtual void NativeConstruct() override;
+	virtual void NativePreConstruct() override;
+	
 private:
 	UFUNCTION()
 	void HandleSelectionChanged(FString SelectedItem, ESelectInfo::Type SelectInfo);

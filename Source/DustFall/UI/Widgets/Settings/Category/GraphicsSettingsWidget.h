@@ -6,6 +6,9 @@
 #include "Blueprint/UserWidget.h"
 #include "GraphicsSettingsWidget.generated.h"
 
+class USettingItem_CheckBox;
+class USettingItem_Slider;
+class USettingItem_Selector;
 /**
  * 
  */
@@ -16,58 +19,58 @@ class DUSTFALL_API UGraphicsSettingsWidget : public UUserWidget
 
 protected:
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_Selector* Selector_TextureQuality;
+	USettingItem_Selector* Selector_TextureQuality;
 
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_Selector* Selector_ShadowQuality;
+	USettingItem_Selector* Selector_ShadowQuality;
 
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_Selector* Selector_GlobalIllumination;
+	USettingItem_Selector* Selector_GlobalIllumination;
 
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_Selector* Selector_Reflections;
+	USettingItem_Selector* Selector_Reflections;
 
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_Selector* Selector_Foliage;
+	USettingItem_Selector* Selector_Foliage;
 
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_Selector* Selector_Shading;
+	USettingItem_Selector* Selector_Shading;
 
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_Selector* Selector_PostProcessingQuality;
+	USettingItem_Selector* Selector_PostProcessingQuality;
 
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_Selector* Selector_EffectsQuality;
+	USettingItem_Selector* Selector_EffectsQuality;
 
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_Selector* Selector_ViewDistanceQuality;
+	USettingItem_Selector* Selector_ViewDistanceQuality;
 
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_Selector* Selector_AntiAliasing;
+	USettingItem_Selector* Selector_AntiAliasing;
 
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_Selector* Selector_AnisotropicFiltering;
+	USettingItem_Selector* Selector_AnisotropicFiltering;
 
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_Selector* Selector_MotionBlurQuality;
+	USettingItem_Selector* Selector_MotionBlurQuality;
 
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_Selector* Selector_AmbientOcclusion;
+	USettingItem_Selector* Selector_AmbientOcclusion;
+	
+	UPROPERTY(meta = (BindWidget))
+	USettingItem_Selector* Selector_ScreenSpaceReflections;
 
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_Slider* Slider_DepthOfField;
+	USettingItem_Slider* Slider_DepthOfField;
 
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_Slider* Slider_Bloom;
+	USettingItem_Slider* Slider_Bloom;
 
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_Selector* Selector_ScreenSpaceReflections;
+	USettingItem_Slider* Slider_Tessellation;
 
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_Slider* Slider_Tessellation;
-
-	UPROPERTY(meta = (BindWidget))
-	class USettingItem_CheckBox* CheckBox_RayTracing;
+	USettingItem_CheckBox* CheckBox_RayTracing;
 
 	virtual void NativeConstruct() override;
 	

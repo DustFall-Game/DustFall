@@ -16,7 +16,7 @@ void UScreenSettingsWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	UScreenSettingsWidget::InitScreenSettings();
+	InitScreenSettings();
 }
 
 ///
@@ -32,7 +32,7 @@ void UScreenSettingsWidget::InitScreenSettings()
 	// Init List Monitors
 	if (ComboBox_Screen)
 	{
-		TArray<FString> Monitors = UScreenSettingsWidget::GetConnectedMonitorsName();
+		TArray<FString> Monitors = GetConnectedMonitorsName();
 
 		ComboBox_Screen->SetItems(Monitors);
 		ComboBox_Screen->SetDefaultValue(Monitors.IsValidIndex(0) ? Monitors[0] : TEXT("Unknown"));
@@ -42,7 +42,7 @@ void UScreenSettingsWidget::InitScreenSettings()
 	// Init Screen Resolution
 	if (ComboBox_ScreenResolution)
 	{
-		const TArray<FString> ScreenResolutions = UScreenSettingsWidget::GetScreenResolutions();
+		const TArray<FString> ScreenResolutions = GetScreenResolutions();
 		const FIntPoint UserScreenResolution = userSettings->GetScreenResolution();
 
 		if (ComboBox_ScreenResolution)

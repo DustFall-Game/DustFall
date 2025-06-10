@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "SettingItemWidget.generated.h"
 
+class UTextBlock;
 /**
  * 
  */
@@ -14,9 +15,9 @@ class DUSTFALL_API USettingItemWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
-	protected:
+protected:
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* Text_Title;
+	UTextBlock* Text_Title;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings", meta = (ExposeOnSpawn))
 	FString Title;

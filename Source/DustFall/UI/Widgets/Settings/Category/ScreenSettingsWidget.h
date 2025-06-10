@@ -7,6 +7,9 @@
 #include "DLSSLibrary.h"
 #include "ScreenSettingsWidget.generated.h"
 
+class USettingItem_Slider;
+class USettingItem_CheckBox;
+class USettingItem_ComboBox;
 /**
  * 
  */
@@ -31,38 +34,38 @@ public:
 	virtual void NativeConstruct() override;
 
 protected:
+	/** Binds */
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_ComboBox* ComboBox_Screen;
+	USettingItem_ComboBox* ComboBox_Screen;
 	
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_ComboBox* ComboBox_ScreenResolution;
+	USettingItem_ComboBox* ComboBox_ScreenResolution;
 
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_ComboBox* ComboBox_ScreenMode;
+	USettingItem_ComboBox* ComboBox_ScreenMode;
 
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_ComboBox* ComboBox_RefreshRate;
+	USettingItem_ComboBox* ComboBox_RefreshRate;
+	
+	UPROPERTY(meta = (BindWidget))
+	USettingItem_ComboBox* ComboBox_Dlss_Quality;
 
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_CheckBox* CheckBox_VSync;
+	USettingItem_CheckBox* CheckBox_VSync;
 
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_Slider* Slider_RenderScale;
+	USettingItem_CheckBox* CheckBox_Dlss_Enable;
 
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_CheckBox* CheckBox_Dlss_Enable;
+	USettingItem_CheckBox* CheckBox_Dlss_GenFrame;
+	
+	UPROPERTY(meta = (BindWidget))
+	USettingItem_Slider* Slider_RenderScale;
 
 	UPROPERTY(meta = (BindWidget))
-	class USettingItem_ComboBox* ComboBox_Dlss_Quality;
-
-	UPROPERTY(meta = (BindWidget))
-	class USettingItem_CheckBox* CheckBox_Dlss_GenFrame;
-
-	UPROPERTY(meta = (BindWidget))
-	class USettingItem_Slider* Slider_Dlss_Sharpness;
+	USettingItem_Slider* Slider_Dlss_Sharpness;
 
 private:
-	UFUNCTION()
 	void InitScreenSettings();
 
 	UFUNCTION()
