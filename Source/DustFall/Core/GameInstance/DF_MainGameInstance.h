@@ -23,7 +23,7 @@ public:
 	TArray<FOnlineSessionSearchResult> OnlineSessionResults;
 	
 	UFUNCTION(BlueprintCallable)
-	void AdvancedCreateSession(const FString& SessionName, bool bUseLan);
+	void AdvancedCreateSession(const FString& SessionName);
 
 	UFUNCTION(BlueprintCallable)
 	UFindSessionsCallbackProxyAdvanced* AdvancedFindSessions(const FString& SessionName);

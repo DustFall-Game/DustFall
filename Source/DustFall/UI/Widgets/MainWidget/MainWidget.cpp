@@ -30,7 +30,7 @@ void UMainWidget::NativeConstruct()
 
 void UMainWidget::OnApplyCreateSessionClicked()
 {
-	if (!EditText_CreateSessionName || !CheckBox_UseLan) return;
+	if (!EditText_CreateSessionName) return;
 	
 	FText SessionName = EditText_CreateSessionName->GetText();
 	FString SessionNameStr = SessionName.ToString().TrimStartAndEnd();
@@ -39,9 +39,7 @@ void UMainWidget::OnApplyCreateSessionClicked()
 	{
 		if (MainGameInstance)
 		{
-			bool bUseLan = CheckBox_UseLan->IsChecked();
-			
-			MainGameInstance->AdvancedCreateSession(SessionNameStr, bUseLan);
+			MainGameInstance->AdvancedCreateSession(SessionNameStr);
 		}
 	}
 	else
@@ -74,6 +72,15 @@ void UMainWidget::StartFindSessions()
 
 void UMainWidget::OnFindSessionSuccess(const TArray<FBlueprintSessionResult>& Results)
 {
+	FString Message = FString::Printf(TEXT("Открытие карты. Найдено сессий: %d"), Results.Num());
+
+	GEngine->AddOnScreenDebugMessage(
+		-1,
+		15.0f,
+		FColor::Green,
+		Message
+	);
+	
 	if (WSwitch_FindSession && FindedSessionWidgetClass && VBox_FindedSessionsList)
 	{
 		if (Results.Num() > 0)

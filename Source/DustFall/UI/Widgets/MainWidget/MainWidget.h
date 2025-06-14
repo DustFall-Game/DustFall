@@ -32,9 +32,6 @@ protected:
 	UButton* Btn_ApplyCreateSession;
 
 	UPROPERTY(meta = (BindWidget))
-	UCheckBox* CheckBox_UseLan;
-
-	UPROPERTY(meta = (BindWidget))
 	UEditableText* EditText_CreateSessionName;
 
 	UPROPERTY(meta = (BindWidget))

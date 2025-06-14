@@ -41,7 +41,7 @@ void UDF_MainGameInstance::InitUniquePlayerId()
 	}
 }
 
-void UDF_MainGameInstance::AdvancedCreateSession(const FString& SessionName, bool bUseLan)
+void UDF_MainGameInstance::AdvancedCreateSession(const FString& SessionName)
 {
 	if (!SessionInterface.IsValid()) return;
 	
@@ -65,7 +65,7 @@ void UDF_MainGameInstance::AdvancedCreateSession(const FString& SessionName, boo
 		PlayerController,
 		4,
 		0,
-		bUseLan,
+		false,
 		true,
 		false,
 		true,
@@ -105,15 +105,15 @@ UFindSessionsCallbackProxyAdvanced* UDF_MainGameInstance::AdvancedFindSessions(c
 	return UFindSessionsCallbackProxyAdvanced::FindSessionsAdvanced(
 		this,
 		PlayerController,
-		100,
+		1000,
 		false,
-		EBPServerPresenceSearchType::ClientServersOnly,
+		EBPServerPresenceSearchType::AllServers,
 		Filters,
 		false,
 		false,
 		false,
 		true,
-		1);
+		0);
 }
 
 void UDF_MainGameInstance::OnCreateSessionSuccess()
