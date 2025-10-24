@@ -6,6 +6,8 @@
 #include "DustFall/UI/Widgets/BaseUserWidget/BaseUserWidget.h"
 #include "HUDWidget.generated.h"
 
+class UProgressBar;
+class UTextBlock;
 /**
  * 
  */
@@ -19,4 +21,20 @@ protected:
 
 	UFUNCTION()
 	void HandleStatChanged(FName StatName, float NewValue);
+
+	/** Bindings */
+	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category="HUD")
+	UTextBlock* Text_Bleeding;
+
+	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, Category="HUD")
+	UProgressBar* PB_Stamina;
+
+	UPROPERTY(meta = (BindWidget))
+	UProgressBar* PB_Health;
+
+	UPROPERTY(meta = (BindWidget))
+	UProgressBar* PB_Satiety;
+	
+	UPROPERTY(meta = (BindWidget))
+	UProgressBar* PB_Thirst;
 };

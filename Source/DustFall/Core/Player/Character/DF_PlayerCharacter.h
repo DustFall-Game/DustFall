@@ -17,11 +17,26 @@ class DUSTFALL_API ADF_PlayerCharacter : public ACharacter, public IInputToPlaye
 public:
 	ADF_PlayerCharacter();
 
+	/** Implements */
+	virtual void HandleSprint_Implementation(bool bIsSprint) override;
 	virtual void HandleCrouch_Implementation(bool bIsNewCrouch) override;
 
 protected:
 	virtual void BeginPlay() override;
 
+	/** Handlers */
+	void HandleDrainStamina();
+	void HandleRegenStamina();
+
+	/** References */
 	UPROPERTY()
 	UPlayerAbilityComponent* AbilityComponent;
+
+	UPROPERTY()
+	UCharacterMovementComponent* MovementComponent;
+
+private:
+	/** Timers */
+	FTimerHandle StaminaDrainTimerHandle;
+	FTimerHandle StaminaRegenTimerHandle;
 };

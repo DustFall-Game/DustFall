@@ -47,12 +47,9 @@ private:
 	ACharacter* ControlledCharacter;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UActorComponent* AbilityComponent;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UActorComponent* UIManager;
 
-	/** Input handlers */
+	/** Input Handlers */
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void StartJump();

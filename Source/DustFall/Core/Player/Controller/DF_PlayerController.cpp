@@ -4,7 +4,6 @@
 #include "DF_PlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "DustFall/Core/Player/Components/Ability/PlayerAbilityComponent.h"
 #include "DustFall/Core/Player/Interfaces/InputToPlayerInterface.h"
 #include "DustFall/UI/Manager/UIManager.h"
 #include "GameFramework/Character.h"
@@ -14,9 +13,6 @@ void ADF_PlayerController::BeginPlay()
 	Super::BeginPlay();
 	
 	ControlledCharacter = Cast<ACharacter>(GetPawn());
-	
-	if (ControlledCharacter)
-		AbilityComponent = ControlledCharacter->FindComponentByClass<UPlayerAbilityComponent>();
 
 	UIManager = FindComponentByClass<UUIManager>();
 	
@@ -47,12 +43,12 @@ void ADF_PlayerController::SetupInputComponent()
 		}
 		if (SprintAction)
 		{
-			EnhancedInput->BindAction(SprintAction, ETriggerEvent::Triggered, this, &ADF_PlayerController::StartSprint);
+			EnhancedInput->BindAction(SprintAction, ETriggerEvent::Started, this, &ADF_PlayerController::StartSprint);
 			EnhancedInput->BindAction(SprintAction, ETriggerEvent::Completed, this, &ADF_PlayerController::StopSprint);
 		}
 		if (CrouchAction)
 		{
-			EnhancedInput->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &ADF_PlayerController::StartCrouch);
+			EnhancedInput->BindAction(CrouchAction, ETriggerEvent::Started, this, &ADF_PlayerController::StartCrouch);
 			EnhancedInput->BindAction(CrouchAction, ETriggerEvent::Completed, this, &ADF_PlayerController::StopCrouch);
 		}
 		if (PauseMenuAction)
@@ -88,55 +84,41 @@ void ADF_PlayerController::Look(const FInputActionValue& Value)
 void ADF_PlayerController::StartJump()
 {
 	if (ControlledCharacter)
-	{
 		ControlledCharacter->Jump();
-	}
 }
 
 void ADF_PlayerController::StopJump()
 {
 	if (ControlledCharacter)
-	{
 		ControlledCharacter->StopJumping();
-	}
 }
 
 void ADF_PlayerController::StartSprint()
 {
-	if (AbilityComponent)
-	{
-		IInputToPlayerInterface::Execute_HandleSprint(AbilityComponent, true);
-	}
+	if (ControlledCharacter)
+		IInputToPlayerInterface::Execute_HandleSprint(ControlledCharacter, true);
 }
 
 void ADF_PlayerController::StopSprint()
 {
-	if (AbilityComponent)
-	{
-		IInputToPlayerInterface::Execute_HandleSprint(AbilityComponent, false);
-	}
+	if (ControlledCharacter)
+		IInputToPlayerInterface::Execute_HandleSprint(ControlledCharacter, false);
 }
 
 void ADF_PlayerController::StartCrouch()
 {
 	if (ControlledCharacter)
-	{
 		IInputToPlayerInterface::Execute_HandleCrouch(ControlledCharacter, true);
-	}
 }
 
 void ADF_PlayerController::StopCrouch()
 {
 	if (ControlledCharacter)
-	{
 		IInputToPlayerInterface::Execute_HandleCrouch(ControlledCharacter, false);
-	}
 }
 
 void ADF_PlayerController::PauseMenu()
 {
 	if (UIManager)
-	{
 		IPlayerToUIInterface::Execute_HandleEscape(UIManager);
-	}
 }

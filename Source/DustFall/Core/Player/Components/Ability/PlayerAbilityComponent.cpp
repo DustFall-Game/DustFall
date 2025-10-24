@@ -2,7 +2,6 @@
 
 
 #include "PlayerAbilityComponent.h"
-
 #include "Blueprint/UserWidget.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Character.h"
@@ -22,7 +21,23 @@ void UPlayerAbilityComponent::BeginPlay()
 		RegenTimerHandle,
 		this,
 		&UPlayerAbilityComponent::HandleRegenerateHealth,
-		1.0f,
+		1.f,
+		true
+	);
+
+	GetWorld()->GetTimerManager().SetTimer(
+		HungerTimerHandle,
+		this,
+		&UPlayerAbilityComponent::HandleHunger,
+		1.f,
+		true
+	);
+
+	GetWorld()->GetTimerManager().SetTimer(
+		ThirstTimerHandle,
+		this,
+		&UPlayerAbilityComponent::HandleThirst,
+		1.f,
 		true
 	);
 		
@@ -70,14 +85,14 @@ void UPlayerAbilityComponent::Multi_PlayerDie_Implementation()
 void UPlayerAbilityComponent::HandleRegenerateHealth()
 {
 	if (Bleeding <= 0)
-		if (Satiety > MaxSatiety * 0.6f && Health < MaxHealth)
-			Health = FMath::Min(Health + 0.1f, MaxHealth);
+		if (Satiety > MaxSatiety * 0.6f && Satiety >= 25.f && Health < MaxHealth)
+			SetHealth(FMath::Min(Health + 0.1f, MaxHealth));
 }
 
 void UPlayerAbilityComponent::HandleBleeding()
 {
-	Health -= 1.f;
-	Bleeding -= 1;
+	SetHealth(Health - 1.f);
+	SetBleeding(Bleeding - 1);
 	
 	if (Health <= 0.f)
 	{
@@ -90,14 +105,23 @@ void UPlayerAbilityComponent::HandleBleeding()
 		GetWorld()->GetTimerManager().ClearTimer(BleedingTimerHandle);
 }
 
-void UPlayerAbilityComponent::HandleSprint_Implementation(bool bIsSprint)
+void UPlayerAbilityComponent::HandleHunger()
 {
-	
+	float Multiplier = bIsSprinting ? SprintMultiplier : IdleMultiplier;
+	SetSatiety(FMath::Clamp(Satiety - BaseHungerRate * Multiplier, 0.f, MaxSatiety));
+}
+
+void UPlayerAbilityComponent::HandleThirst()
+{
+	float Multiplier = bIsSprinting ? SprintMultiplier : IdleMultiplier;
+	SetThirst(FMath::Clamp(Thirst - BaseThirstRate * Multiplier, 0.f, MaxThirst));
+
+	MaxStamina = Thirst <= 20.f ? 70.f : 100.f;
 }
 
 void UPlayerAbilityComponent::TakeDamage_Implementation(float Damage, AActor* Character, FName Bone)
 {
-	Health -= Damage;
+	SetHealth(Health - Damage);
 
 	if (Health <= 0)
 	{
@@ -106,34 +130,39 @@ void UPlayerAbilityComponent::TakeDamage_Implementation(float Damage, AActor* Ch
 	}
 
 	if (FMath::FRand() <= 0.4f) {
-		Bleeding = FMath::RandRange(2.f, 4.f);
+		SetBleeding(Bleeding + FMath::RandRange(1.f, 3.f));
 		
-		GetWorld()->GetTimerManager().SetTimer(BleedingTimerHandle, this, &UPlayerAbilityComponent::HandleBleeding, 1.5f, true);
+		GetWorld()->GetTimerManager().SetTimer(BleedingTimerHandle, this, &UPlayerAbilityComponent::HandleBleeding, 2.f, true);
 	}
 }
 
-void UPlayerAbilityComponent::OnRep_Health()
+void UPlayerAbilityComponent::SetHealth(float NewHealth)
 {
+	Health = FMath::Clamp(NewHealth, 0.f, MaxHealth);
 	OnStatChanged.Broadcast("Health", Health);
 }
 
-void UPlayerAbilityComponent::OnRep_Stamina()
+void UPlayerAbilityComponent::SetStamina(float NewStamina)
 {
+	Stamina = FMath::Clamp(NewStamina, 0.f, MaxStamina);
 	OnStatChanged.Broadcast("Stamina", Stamina);
 }
 
-void UPlayerAbilityComponent::OnRep_Satiety()
+void UPlayerAbilityComponent::SetSatiety(float NewSatiety)
 {
+	Satiety = FMath::Clamp(NewSatiety, 0.f, MaxSatiety);
 	OnStatChanged.Broadcast("Satiety", Satiety);
 }
 
-void UPlayerAbilityComponent::OnRep_Thirst()
+void UPlayerAbilityComponent::SetThirst(float NewThirst)
 {
+	Thirst = FMath::Clamp(NewThirst, 0.f, MaxThirst);
 	OnStatChanged.Broadcast("Thirst", Thirst);
 }
 
-void UPlayerAbilityComponent::OnRep_Bleeding()
+void UPlayerAbilityComponent::SetBleeding(float NewBleeding)
 {
+	Bleeding = FMath::Max(NewBleeding, 0.f);
 	OnStatChanged.Broadcast("Bleeding", Bleeding);
 }
 
@@ -146,4 +175,5 @@ void UPlayerAbilityComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeP
 	DOREPLIFETIME(UPlayerAbilityComponent, Satiety);
 	DOREPLIFETIME(UPlayerAbilityComponent, Thirst);
 	DOREPLIFETIME(UPlayerAbilityComponent, Bleeding);
+	DOREPLIFETIME(UPlayerAbilityComponent, bIsSprinting);
 }
