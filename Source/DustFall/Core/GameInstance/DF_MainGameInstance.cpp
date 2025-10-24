@@ -46,9 +46,7 @@ void UDF_MainGameInstance::AdvancedCreateSession(const FString& SessionName)
 	if (!SessionInterface.IsValid()) return;
 	
 	if (SessionInterface->GetNamedSession(NAME_GameSession))
-	{
 		SessionInterface->DestroySession(NAME_GameSession);
-	}
 
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	if (!PlayerController) return;
@@ -124,7 +122,7 @@ void UDF_MainGameInstance::OnCreateSessionSuccess()
 	FColor::Green,
 	TEXT("Открытие карты"));
 	
-	GetWorld()->ServerTravel(TEXT("/Game/Maps/MainMenuMap?listen"), true);
+	GetWorld()->ServerTravel(TEXT("/Game/Maps/TestMechanicsMap?listen"), true);
 }
 
 void UDF_MainGameInstance::OnCreateSessionFailure()

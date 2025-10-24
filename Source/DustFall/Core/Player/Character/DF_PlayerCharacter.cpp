@@ -61,12 +61,12 @@ void ADF_PlayerCharacter::HandleSprint_Implementation(bool bIsSprint)
 
 void ADF_PlayerCharacter::HandleDrainStamina()
 {
-	if (!AbilityComponent && !MovementComponent) return;
+	if (!AbilityComponent || !MovementComponent) return;
 
 	float NewStamina = FMath::Max(AbilityComponent->GetStamina() - 0.9f, 0.f);
 	AbilityComponent->SetStamina(NewStamina);
 
-	if (NewStamina == 0.f || MovementComponent->Velocity.Size2D() < 10.0f)
+	if (FMath::IsNearlyZero(NewStamina) || MovementComponent->Velocity.Size2D() < 10.0f)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(StaminaDrainTimerHandle);
 		Execute_HandleSprint(this, false);
@@ -77,7 +77,7 @@ void ADF_PlayerCharacter::HandleRegenStamina()
 {
 	if (!AbilityComponent) return;
 	
-	float NewStamina = FMath::Clamp(AbilityComponent->GetStamina() + 0.6f, 0.f, AbilityComponent->GetMaxStamina());
+	float NewStamina = FMath::Min(AbilityComponent->GetStamina() + 0.6f, AbilityComponent->GetMaxStamina());
 	AbilityComponent->SetStamina(NewStamina);
 
 	if (FMath::IsNearlyEqual(NewStamina, AbilityComponent->GetMaxStamina()))
