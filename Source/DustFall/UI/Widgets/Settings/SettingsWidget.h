@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "DLSSLibrary.h"
 #include "Blueprint/UserWidget.h"
 #include "SettingsWidget.generated.h"
 

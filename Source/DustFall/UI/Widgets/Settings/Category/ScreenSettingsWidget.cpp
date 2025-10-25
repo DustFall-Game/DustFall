@@ -25,9 +25,9 @@ void UScreenSettingsWidget::NativeConstruct()
 
 void UScreenSettingsWidget::InitScreenSettings()
 {
-	UGameUserSettings* userSettings = GEngine->GetGameUserSettings();
+	auto UserSettings = GEngine->GetGameUserSettings();
 
-	if (userSettings == nullptr) return;
+	if (UserSettings == nullptr) return;
 
 	// Init List Monitors
 	if (ComboBox_Screen)
@@ -43,7 +43,7 @@ void UScreenSettingsWidget::InitScreenSettings()
 	if (ComboBox_ScreenResolution)
 	{
 		const TArray<FString> ScreenResolutions = GetScreenResolutions();
-		const FIntPoint UserScreenResolution = userSettings->GetScreenResolution();
+		const FIntPoint UserScreenResolution = UserSettings->GetScreenResolution();
 
 		if (ComboBox_ScreenResolution)
 		{
@@ -59,7 +59,7 @@ void UScreenSettingsWidget::InitScreenSettings()
 	// Init Screen Mode
 	if (ComboBox_ScreenMode)
 	{
-		const EWindowMode::Type UserWindowMode = userSettings->GetFullscreenMode();
+		const EWindowMode::Type UserWindowMode = UserSettings->GetFullscreenMode();
 
 		const TArray<FString> ScreenModes = {"Fullscreen", "Windowed", "Windowed Fullscreen"};
 
@@ -88,7 +88,7 @@ void UScreenSettingsWidget::InitScreenSettings()
 	// Init Refresh Rate
 	if (ComboBox_RefreshRate)
 	{
-		const float CurrentFrateRate = userSettings->GetFrameRateLimit();
+		const float CurrentFrateRate = UserSettings->GetFrameRateLimit();
 
 		ComboBox_RefreshRate->SetItems(FrameRates);
 
@@ -104,7 +104,7 @@ void UScreenSettingsWidget::InitScreenSettings()
 	// Init VSync
 	if (CheckBox_VSync)
 	{
-		CheckBox_VSync->SetValue(userSettings->IsVSyncEnabled());
+		CheckBox_VSync->SetValue(UserSettings->IsVSyncEnabled());
 		CheckBox_VSync->OnCheckBoxChanged.AddDynamic(this, &UScreenSettingsWidget::OnVSyncChange);
 	}
 
@@ -113,7 +113,7 @@ void UScreenSettingsWidget::InitScreenSettings()
 	{
 		Slider_RenderScale->SetMinValue(70.0f);
 		Slider_RenderScale->SetMaxValue(200.0f);
-		Slider_RenderScale->SetValue(userSettings->GetDefaultResolutionScale());
+		Slider_RenderScale->SetValue(UserSettings->GetDefaultResolutionScale());
 		Slider_RenderScale->OnValueChanged.AddDynamic(this, &UScreenSettingsWidget::OnRenderScaleChanged);
 	}
 
@@ -149,7 +149,7 @@ void UScreenSettingsWidget::InitScreenSettings()
 
 void UScreenSettingsWidget::OnScreenResolutionChanged(const FString& SelectedItem)
 {
-	UGameUserSettings* UserSettings = GEngine->GetGameUserSettings();
+	auto UserSettings = GEngine->GetGameUserSettings();
 
 	if (UserSettings == nullptr) return;
 
@@ -175,7 +175,7 @@ void UScreenSettingsWidget::OnScreenResolutionChanged(const FString& SelectedIte
 
 void UScreenSettingsWidget::OnScreenModeChange(const FString& SelectedItem)
 {
-	UGameUserSettings* UserSettings = GEngine->GetGameUserSettings();
+	auto UserSettings = GEngine->GetGameUserSettings();
 
 	if (UserSettings == nullptr) return;
 
@@ -191,7 +191,7 @@ void UScreenSettingsWidget::OnScreenModeChange(const FString& SelectedItem)
 
 void UScreenSettingsWidget::OnRefreshRateChange(const FString& SelectedItem)
 {
-	if (UGameUserSettings* UserSettings = GEngine->GetGameUserSettings())
+	if (auto UserSettings = GEngine->GetGameUserSettings())
 	{
 		const bool bIsUnlimited = SelectedItem.Equals(TEXT("Unlimited"), ESearchCase::IgnoreCase);
 		const float FrameRate = bIsUnlimited ? 0.f : FCString::Atof(*SelectedItem);
@@ -207,7 +207,7 @@ void UScreenSettingsWidget::OnRefreshRateChange(const FString& SelectedItem)
 
 void UScreenSettingsWidget::OnRenderScaleChanged(const float Value)
 {
-	UGameUserSettings* UserSettings = GEngine->GetGameUserSettings();
+	auto UserSettings = GEngine->GetGameUserSettings();
 
 	if (UserSettings == nullptr) return;
 
@@ -217,7 +217,7 @@ void UScreenSettingsWidget::OnRenderScaleChanged(const float Value)
 
 void UScreenSettingsWidget::OnVSyncChange(const bool Value)
 {
-	UGameUserSettings* UserSettings = GEngine->GetGameUserSettings();
+	auto UserSettings = GEngine->GetGameUserSettings();
 
 	if (UserSettings == nullptr) return;
 
@@ -233,7 +233,7 @@ void UScreenSettingsWidget::OnMonitorChange(const FString& SelectedItem)
 	FDisplayMetrics DisplayMetrics;
 	FDisplayMetrics::RebuildDisplayMetrics(DisplayMetrics);
 
-	UGameUserSettings* UserSettings = GEngine->GetGameUserSettings();
+	auto UserSettings = GEngine->GetGameUserSettings();
 
 	if (UserSettings == nullptr) return;
 

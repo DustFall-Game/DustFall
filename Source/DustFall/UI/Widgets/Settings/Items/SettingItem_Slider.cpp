@@ -12,9 +12,7 @@ void USettingItem_Slider::NativeConstruct()
 	Super::NativeConstruct();
 
 	if (Slider)
-	{
 		Slider->OnValueChanged.AddDynamic(this, &USettingItem_Slider::HandleValueChanged);
-	}
 }
 
 void USettingItem_Slider::NativePreConstruct()
@@ -22,9 +20,7 @@ void USettingItem_Slider::NativePreConstruct()
 	Super::NativePreConstruct();
 
 	if (Text_Title)
-	{
 		Text_Title->SetText(FText::FromString(Title));
-	}
 }
 
 void USettingItem_Slider::SetValue(float value)

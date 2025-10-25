@@ -8,6 +8,7 @@
 #include "FindSessionsCallbackProxyAdvanced.h"
 #include "OnlineSubsystem.h"
 #include "OnlineSubsystemUtils.h"
+#include "DustFall/Systems/UserSettings/DF_UserSettings.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -21,9 +22,29 @@ void UDF_MainGameInstance::Init()
 		SessionInterface = Subsystem->GetSessionInterface();
 
 		if (SessionInterface.IsValid())
-		{
 			OnJoinSessionCompleteDelegate = FOnJoinSessionCompleteDelegate::CreateUObject(this, &UDF_MainGameInstance::OnJoinSessionComplete);
-		}
+	}
+
+	
+	if (auto Settings = Cast<UDF_UserSettings>(GEngine->GetGameUserSettings()))
+	{
+		UGameplayStatics::SetSoundMixClassOverride(
+			GetWorld(),
+			MainSoundMix,
+			MasterVolumeClass,     
+			Settings->GetMasterVolume(),
+			1.f,
+			0.f
+		);
+		
+		UGameplayStatics::SetSoundMixClassOverride(GetWorld(), MainSoundMix, VoiceVolumeClass, Settings->GetVoiceVolume());
+		UGameplayStatics::SetSoundMixClassOverride(GetWorld(), MainSoundMix, SFXVolumeClass, Settings->GetSFXVolume());
+		UGameplayStatics::SetSoundMixClassOverride(GetWorld(), MainSoundMix, AmbientVolumeClass, Settings->GetAmbientVolume());
+		
+		UE_LOG(LogTemp, Error, TEXT("UDF_MainGameInstance::Init() — Master: %.2f, Voice: %.2f, SFX: %.2f, Ambient: %.2f"),
+			Settings->GetMasterVolume(), Settings->GetVoiceVolume(), Settings->GetSFXVolume(), Settings->GetAmbientVolume());
+		
+		UGameplayStatics::PushSoundMixModifier(GetWorld(), MainSoundMix);
 	}
 }
 
@@ -142,9 +163,7 @@ void UDF_MainGameInstance::AdvancedJoinSession(const FString& SessionName, const
 
 	bool bStarted = SessionInterface->JoinSession(*UniquePlayerNetId, FName(SessionName), OnlineSessionResults[SessionIndex]);
 	if (!bStarted)
-	{
 		SessionInterface->ClearOnJoinSessionCompleteDelegate_Handle(OnJoinSessionCompleteHandle);
-	}
 }
 
 void UDF_MainGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)

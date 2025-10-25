@@ -186,7 +186,7 @@ void UGraphicsSettingsWidget::OnChangeRayTracing(const bool& Value)
 
 void UGraphicsSettingsWidget::ApplySetting(TFunctionRef<void(UGameUserSettings*)> ApplyFunc)
 {
-	if (UGameUserSettings* Settings = GEngine->GetGameUserSettings())
+	if (auto Settings = GEngine->GetGameUserSettings())
 	{
 		ApplyFunc(Settings);
 		Settings->ApplySettings(false);

@@ -7,6 +7,7 @@
 #include "InputMappingContext.h"
 #include "DF_PlayerController.generated.h"
 
+class UDF_UserSettings;
 /**
  * 
  */
@@ -20,6 +21,9 @@ protected:
 	virtual void SetupInputComponent() override;
 
 private:
+	UPROPERTY()
+	UDF_UserSettings* UserSettings;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputMappingContext* InputMappingContext;
 

@@ -5,6 +5,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "DustFall/Core/Player/Interfaces/InputToPlayerInterface.h"
+#include "DustFall/Systems/UserSettings/DF_UserSettings.h"
 #include "DustFall/UI/Manager/UIManager.h"
 #include "GameFramework/Character.h"
 
@@ -15,6 +16,7 @@ void ADF_PlayerController::BeginPlay()
 	ControlledCharacter = Cast<ACharacter>(GetPawn());
 
 	UIManager = FindComponentByClass<UUIManager>();
+	UserSettings = Cast<UDF_UserSettings>(GEngine->GetGameUserSettings());
 	
 	if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
@@ -77,8 +79,10 @@ void ADF_PlayerController::Look(const FInputActionValue& Value)
 {
 	FVector2D LookAxis = Value.Get<FVector2D>();
 	
-	AddYawInput(LookAxis.X);
-	AddPitchInput(LookAxis.Y);		
+	float MouseSensitivity = UserSettings->GetMouseSensitivity();
+	
+	AddYawInput(LookAxis.X * MouseSensitivity);
+	AddPitchInput(LookAxis.Y * MouseSensitivity);		
 }
 
 void ADF_PlayerController::StartJump()
