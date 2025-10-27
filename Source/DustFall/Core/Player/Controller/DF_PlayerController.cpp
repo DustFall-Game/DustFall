@@ -8,20 +8,26 @@
 #include "DustFall/Systems/UserSettings/DF_UserSettings.h"
 #include "DustFall/UI/Manager/UIManager.h"
 #include "GameFramework/Character.h"
+#include "UserSettings/EnhancedInputUserSettings.h"
 
 void ADF_PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	ControlledCharacter = Cast<ACharacter>(GetPawn());
-
 	UIManager = FindComponentByClass<UUIManager>();
+	
+	ControlledCharacter = Cast<ACharacter>(GetPawn());
 	UserSettings = Cast<UDF_UserSettings>(GEngine->GetGameUserSettings());
 	
 	if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
-			if (InputMappingContext)
-				Subsystem->AddMappingContext(InputMappingContext, 0);
+		{
+			if (InputMappingContext && !GetWorld()->GetMapName().Contains(TEXT("MenuMap")))
+            	Subsystem->AddMappingContext(InputMappingContext, 0);
+
+			if (auto InputUserSettings = Subsystem->GetUserSettings(); !InputUserSettings->IsMappingContextRegistered(InputMappingContext))
+				InputUserSettings->RegisterInputMappingContext(InputMappingContext);
+		}
 }
 
 void ADF_PlayerController::SetupInputComponent()
@@ -124,5 +130,5 @@ void ADF_PlayerController::StopCrouch()
 void ADF_PlayerController::PauseMenu()
 {
 	if (UIManager)
-		IPlayerToUIInterface::Execute_HandleEscape(UIManager);
+		UIManager->HandleEscape();
 }

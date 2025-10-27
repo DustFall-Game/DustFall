@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "DustFall/UI/Interface/PlayerToUIInterface.h"
+
 #include "DustFall/UI/Widgets/BaseUserWidget/BaseUserWidget.h"
 #include "UIManager.generated.h"
 
@@ -12,39 +12,49 @@
 class UInputMappingContext;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class DUSTFALL_API UUIManager : public UActorComponent, public IPlayerToUIInterface
+class DUSTFALL_API UUIManager : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
 	UUIManager();
 	
-	/** Interfaces */
-	UBaseUserWidget* GetUI_Implementation(FName WidgetName) override;
-	bool ShowUI_Implementation(TSubclassOf<UBaseUserWidget> WidgetClass) override;
-	void HandleEscape_Implementation() override;
+	UFUNCTION(BlueprintCallable, Category="UI")
+	UBaseUserWidget* GetWidgetByName(FName WidgetName);
+	
+	UFUNCTION(BlueprintCallable, Category="UI")
+	bool ShowUI(TSubclassOf<UBaseUserWidget> WidgetClass);
+	
+	UFUNCTION(BlueprintCallable, Category="UI")
+	void HandleEscape();
+	
+	UFUNCTION(BlueprintCallable, Category="UI")
+	void CloseAllUI();
 
 protected:
 	virtual void BeginPlay() override;
-	void SetInputSettings(bool bIsUIActive);
-	void ChangeVisibilityWidget(UBaseUserWidget* Widget);
-	UBaseUserWidget* GetActivityWidgetByClass(TSubclassOf<UBaseUserWidget> WidgetClass);
+
+private:
+	UBaseUserWidget* GetOrCreateWidget(TSubclassOf<UBaseUserWidget> WidgetClass);
+	void SetInputMode(bool bUIActive);
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI")
+	/** Data */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI", meta=(AllowPrivateAccess="true"))
 	TSubclassOf<UBaseUserWidget> PauseMenuWidget;
 
+	UPROPERTY(EditDefaultsOnly, Category="Input", meta=(AllowPrivateAccess="true"))
+	UInputMappingContext* MainInputMappingContext;
+
+	UPROPERTY(EditDefaultsOnly, Category="Input", meta=(AllowPrivateAccess="true"))
+	UInputMappingContext* PauseInputMappingContext;
+	
+	/** References */
 	UPROPERTY()
-	UBaseUserWidget* ActivityWidget;
+	APlayerController* PlayerController = nullptr;
 
 	UPROPERTY()
-	APlayerController* PlayerController;
-	
+	UBaseUserWidget* ActiveWidget = nullptr;
+
 	UPROPERTY()
 	TMap<FName, UBaseUserWidget*> Widgets;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	UInputMappingContext* MainInputMappingContext;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	UInputMappingContext* PauseInputMappingContext;
 };

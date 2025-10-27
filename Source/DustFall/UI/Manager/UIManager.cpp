@@ -2,7 +2,6 @@
 
 
 #include "UIManager.h"
-
 #include "EnhancedInputSubsystems.h"
 #include "Blueprint/UserWidget.h"
 
@@ -12,140 +11,120 @@ UUIManager::UUIManager()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-UBaseUserWidget* UUIManager::GetUI_Implementation(FName WidgetName)
-{
-	if (UBaseUserWidget** FoundWidget = Widgets.Find(WidgetName))
-	{
-		return *FoundWidget;
-	}
-
-	return nullptr;
-}
-
 void UUIManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (!GetOwner()) return;
-	
 	PlayerController = Cast<APlayerController>(GetOwner());
+	if (!PlayerController)
+		UE_LOG(LogTemp, Warning, TEXT("UUIManager: Owner is not PlayerController."));
 }
 
-bool UUIManager::ShowUI_Implementation(TSubclassOf<UBaseUserWidget> WidgetClass)
+UBaseUserWidget* UUIManager::GetWidgetByName(FName WidgetName)
 {
-	if (!WidgetClass) return false;
-
-	UBaseUserWidget* Widget = GetActivityWidgetByClass(WidgetClass);
-
-	if (Widget)
-	{
-		if (Widget->IsVisible())
-		{
-			if (Widget->bCanClose)
-			{
-				Widget->SetVisibility(ESlateVisibility::Collapsed);
-				ActivityWidget = nullptr;
-				SetInputSettings(false);
-				return false;
-			}
-			return true;
-		}
-		
-		Widget->SetVisibility(ESlateVisibility::Visible);
-		if (Widget->bCanClose)
-		{
-			ActivityWidget = Widget;
-		}
-		SetInputSettings(true);
-		return true;
-	}
+	if (UBaseUserWidget* const* Found = Widgets.Find(WidgetName))
+		return *Found;
 	
-	auto NewWidget = CreateWidget<UBaseUserWidget>(PlayerController, WidgetClass);
-	if (!NewWidget) return false;
-
-	NewWidget->AddToViewport();
-	Widgets.Add(NewWidget->WidgetName, NewWidget);
-
-	if (NewWidget->bCanClose)
-	{
-		ActivityWidget = NewWidget;
-	}
-
-	SetInputSettings(true);
-	return true;
-}
-
-void UUIManager::HandleEscape_Implementation()
-{
-	if (ActivityWidget && ActivityWidget->bCanClose)
-	{
-		ActivityWidget->Close();
-		ActivityWidget->SetVisibility(ESlateVisibility::Collapsed);
-		ActivityWidget = nullptr;
-		SetInputSettings(false);
-		return;
-	}
-	
-	if (!PauseMenuWidget) return;
-
-	UBaseUserWidget* PauseWidget = GetActivityWidgetByClass(PauseMenuWidget);
-
-	if (PauseWidget)
-	{
-		bool bIsVisible = PauseWidget->IsVisible();
-		PauseWidget->SetVisibility(bIsVisible ? ESlateVisibility::Collapsed : ESlateVisibility::Visible);
-		ActivityWidget = bIsVisible ? nullptr : PauseWidget;
-		SetInputSettings(!bIsVisible);
-	}
-	else
-	{
-		auto NewPauseWidget = CreateWidget<UBaseUserWidget>(PlayerController, PauseMenuWidget);
-		if (NewPauseWidget)
-		{
-			NewPauseWidget->AddToViewport();
-			Widgets.Add(NewPauseWidget->WidgetName, NewPauseWidget);
-			ActivityWidget = NewPauseWidget;
-			SetInputSettings(true);
-		}
-	}
-}
-
-void UUIManager::ChangeVisibilityWidget(UBaseUserWidget* Widget)
-{
-	if (!IsValid(Widget)) return;
-
-	bool bVisible = Widget->IsVisible();
-	Widget->SetVisibility(bVisible ? ESlateVisibility::Collapsed : ESlateVisibility::Visible);
-	SetInputSettings(!bVisible);
-}
-
-UBaseUserWidget* UUIManager::GetActivityWidgetByClass(TSubclassOf<UBaseUserWidget> WidgetClass)
-{
-	for (const TPair<FName, UBaseUserWidget*>& Pair : Widgets)
-	{
-		UBaseUserWidget* Widget = Pair.Value;
-		if (IsValid(Widget) && Widget->GetClass() == WidgetClass)
-		{
-			return Widget;
-		}
-	}
 	return nullptr;
 }
 
-void UUIManager::SetInputSettings(bool bIsUIActive)
+bool UUIManager::ShowUI(TSubclassOf<UBaseUserWidget> WidgetClass)
+{
+	if (!WidgetClass || !PlayerController) return false;
+
+	auto Widget = GetOrCreateWidget(WidgetClass);
+	if (!Widget) return false;
+	
+	if (Widget->IsVisible())
+	{
+		if (Widget->bCanClose)
+		{
+			Widget->SetVisibility(ESlateVisibility::Collapsed);
+			
+			if (ActiveWidget == Widget)
+				ActiveWidget = nullptr;
+			
+			SetInputMode(false);
+		}
+		
+		return false;
+	}
+	
+	if (ActiveWidget && ActiveWidget->bCanClose)
+		ActiveWidget->SetVisibility(ESlateVisibility::Collapsed);
+	
+	Widget->SetVisibility(ESlateVisibility::Visible);
+	if (Widget->bCanClose)
+		ActiveWidget = Widget;
+	
+	SetInputMode(true);
+	return true;
+}
+
+void UUIManager::HandleEscape()
+{
+	if (ActiveWidget && ActiveWidget->bCanClose)
+	{
+		ActiveWidget->Close();
+		ActiveWidget->SetVisibility(ESlateVisibility::Collapsed);
+		ActiveWidget = nullptr;
+		SetInputMode(false);
+		
+		return;
+	}
+	
+	if (PauseMenuWidget)
+		ShowUI(PauseMenuWidget);
+}
+
+void UUIManager::CloseAllUI()
+{
+	for (auto& Pair : Widgets)
+	{
+		if (UBaseUserWidget* Widget = Pair.Value)
+			if (Widget->IsVisible())
+				Widget->SetVisibility(ESlateVisibility::Collapsed);
+	}
+
+	ActiveWidget = nullptr;
+	SetInputMode(false);
+}
+
+UBaseUserWidget* UUIManager::GetOrCreateWidget(TSubclassOf<UBaseUserWidget> WidgetClass)
+{
+	for (auto& Pair : Widgets)
+	{
+		if (Pair.Value && Pair.Value->GetClass() == WidgetClass)
+			return Pair.Value;
+	}
+	
+	auto NewWidget = CreateWidget<UBaseUserWidget>(PlayerController, WidgetClass);
+	if (!NewWidget) return nullptr;
+
+	NewWidget->AddToViewport();
+	Widgets.Add(NewWidget->WidgetName, NewWidget);
+	
+	return NewWidget;
+}
+
+void UUIManager::SetInputMode(bool bUIActive)
 {
 	if (!PlayerController) return;
 
 	if (ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer())
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
-		{
+		if (auto Subsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
 			if (MainInputMappingContext && PauseInputMappingContext)
 			{
-				Subsystem->RemoveMappingContext(bIsUIActive ? MainInputMappingContext : PauseInputMappingContext);
-				Subsystem->AddMappingContext(bIsUIActive ? PauseInputMappingContext : MainInputMappingContext, 0);
+				Subsystem->RemoveMappingContext(bUIActive ? MainInputMappingContext : PauseInputMappingContext);
+				Subsystem->AddMappingContext(bUIActive ? PauseInputMappingContext : MainInputMappingContext, 0);
 			}
-		}
-		PlayerController->bShowMouseCursor = bIsUIActive;
-	}
+
+	PlayerController->bShowMouseCursor = bUIActive;
+
+	/*
+	if (bUIActive)
+		PlayerController->SetInputMode(FInputModeUIOnly());
+	else
+		PlayerController->SetInputMode(FInputModeGameOnly());
+	*/
 }

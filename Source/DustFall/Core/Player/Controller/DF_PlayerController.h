@@ -7,6 +7,7 @@
 #include "InputMappingContext.h"
 #include "DF_PlayerController.generated.h"
 
+class UUIManager;
 class UDF_UserSettings;
 /**
  * 
@@ -51,7 +52,7 @@ private:
 	ACharacter* ControlledCharacter;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UActorComponent* UIManager;
+	UUIManager* UIManager;
 
 	/** Input Handlers */
 	void Move(const FInputActionValue& Value);

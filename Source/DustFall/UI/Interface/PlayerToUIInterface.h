@@ -20,14 +20,5 @@ class UPlayerToUIInterface : public UInterface
 class DUSTFALL_API IPlayerToUIInterface
 {
 	GENERATED_BODY()
-
-public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Interfaces")
-	UBaseUserWidget* GetUI(FName WidgetName);
 	
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Interfaces")
-	bool ShowUI(TSubclassOf<UBaseUserWidget> WidgetClass);
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Interfaces")
-	void HandleEscape();
 };

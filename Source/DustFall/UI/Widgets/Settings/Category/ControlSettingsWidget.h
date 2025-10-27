@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "ControlSettingsWidget.generated.h"
 
+class UVerticalBox;
 class UDF_UserSettings;
 class USettingItem_Slider;
 /**
@@ -21,6 +22,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	USettingItem_Slider* Slider_MouseSensitivity;
 
+	UPROPERTY(meta = (BindWidget))
+	UVerticalBox* VB_ControlSettings;
+
 protected:
 	virtual void NativeConstruct() override;
 
@@ -30,8 +34,12 @@ protected:
 	UFUNCTION()
 	void SaveSettings();
 
+	/** References */
 	UPROPERTY()
 	UDF_UserSettings* UserSettings;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI")
+	TSubclassOf<UUserWidget> KeySelectorWidgetClass;
 
 private:
 	FTimerHandle SaveTimerHandle;

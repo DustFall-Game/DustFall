@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "DF_PlayerCharacter.generated.h"
 
+class UBaseUserWidget;
 class UPlayerAbilityComponent;
 
 UCLASS()
@@ -34,6 +35,12 @@ protected:
 
 	UPROPERTY()
 	UCharacterMovementComponent* MovementComponent;
+
+	UPROPERTY()
+	APlayerController* PlayerController;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI")
+	TSubclassOf<UBaseUserWidget> HUDWidgetClass;
 
 private:
 	/** Timers */

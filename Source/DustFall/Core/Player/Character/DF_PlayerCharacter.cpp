@@ -2,7 +2,10 @@
 
 
 #include "DF_PlayerCharacter.h"
+
+#include "Blueprint/UserWidget.h"
 #include "DustFall/Core/Player/Components/Ability/PlayerAbilityComponent.h"
+#include "DustFall/UI/Manager/UIManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 
@@ -16,6 +19,11 @@ void ADF_PlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	AbilityComponent = FindComponentByClass<UPlayerAbilityComponent>();
+	PlayerController = Cast<APlayerController>(GetController());
+
+	if (HUDWidgetClass && PlayerController)
+		if (auto UIManager = PlayerController->FindComponentByClass<UUIManager>())
+			UIManager->ShowUI(HUDWidgetClass);
 }
 
 void ADF_PlayerCharacter::HandleSprint_Implementation(bool bIsSprint)
