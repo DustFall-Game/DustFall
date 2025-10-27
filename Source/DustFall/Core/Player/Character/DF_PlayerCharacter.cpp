@@ -22,8 +22,9 @@ void ADF_PlayerCharacter::BeginPlay()
 	PlayerController = Cast<APlayerController>(GetController());
 
 	if (HUDWidgetClass && PlayerController)
-		if (auto UIManager = PlayerController->FindComponentByClass<UUIManager>())
-			UIManager->ShowUI(HUDWidgetClass);
+		if (PlayerController->IsLocalController())
+			if (auto UIManager = PlayerController->FindComponentByClass<UUIManager>())
+				UIManager->ShowUI(HUDWidgetClass);
 }
 
 void ADF_PlayerCharacter::HandleSprint_Implementation(bool bIsSprint)

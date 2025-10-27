@@ -13,4 +13,10 @@ UCLASS()
 class DUSTFALL_API ADF_StartGamemode : public AGameModeBase
 {
 	GENERATED_BODY()
+
+protected:
+	virtual void BeginPlay() override;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI")
+	TSubclassOf<UUserWidget> MainMenuWidgetClass;
 };
