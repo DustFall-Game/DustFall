@@ -2,7 +2,6 @@
 
 
 #include "DF_MainGameInstance.h"
-
 #include "AdvancedSessionsLibrary.h"
 #include "CreateSessionCallbackProxyAdvanced.h"
 #include "FindSessionsCallbackProxyAdvanced.h"
@@ -24,7 +23,6 @@ void UDF_MainGameInstance::Init()
 		if (SessionInterface.IsValid())
 			OnJoinSessionCompleteDelegate = FOnJoinSessionCompleteDelegate::CreateUObject(this, &UDF_MainGameInstance::OnJoinSessionComplete);
 	}
-
 	
 	if (auto Settings = Cast<UDF_UserSettings>(GEngine->GetGameUserSettings()))
 	{
