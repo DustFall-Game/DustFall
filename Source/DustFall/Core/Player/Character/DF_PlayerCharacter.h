@@ -22,6 +22,9 @@ public:
 	virtual void HandleSprint_Implementation(bool bIsSprint) override;
 	virtual void HandleCrouch_Implementation(bool bIsNewCrouch) override;
 
+	UFUNCTION(Server, Reliable)
+	void ServerHandleSprint(bool bIsNewSprint);
+
 protected:
 	virtual void BeginPlay() override;
 

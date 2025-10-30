@@ -4,16 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "DustFall/Core/Interfaces/DamageInterface.h"
+#include "DustFall/Core/Components/Ability/BaseAbilityComponent.h"
 #include "PlayerAbilityComponent.generated.h"
-
 
 class UCharacterMovementComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStatChanged, FName, StatName, float, NewValue);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class DUSTFALL_API UPlayerAbilityComponent : public UActorComponent, public IDamageInterface
+class DUSTFALL_API UPlayerAbilityComponent : public UBaseAbilityComponent
 {
 	GENERATED_BODY()
 
@@ -35,16 +34,8 @@ public:
 	
 	/** Client RPCs */
 	UFUNCTION(Client, Reliable)
-	void Client_PlayerDie();
-
-	/** Server RPCs */
-	UFUNCTION(Server, Reliable)
-	void Server_PlayerDie();
-
-	/** Multicast RPCs */
-	UFUNCTION(NetMulticast, Reliable)
-	void Multi_PlayerDie();
-
+	void Client_Die();
+	
 	/** Implements */
 	virtual void TakeDamage_Implementation(float Damage, AActor* Character, FName Bone) override;
 
@@ -54,6 +45,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void OnRep_Health() override;
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 	/** Setters*/
@@ -63,9 +55,6 @@ protected:
 	void SetBleeding(float NewBleeding);
 
 	/** References */
-	UPROPERTY()
-	ACharacter* PlayerCharacter = nullptr;
-
 	UPROPERTY()
 	APlayerController* PlayerController = nullptr;
 
@@ -86,7 +75,7 @@ protected:
 	void HandleHunger();
 
 	UFUNCTION()
-	void HandleThirst(); 
+	void HandleThirst();
 
 private:
 	/** Timers */
@@ -97,9 +86,6 @@ private:
 
 	float BaseHungerRate = 0.1f;
 	float BaseThirstRate = 0.12f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerAbility", meta = (AllowPrivateAccess = "true"))
-	float MaxHealth = 100.f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerAbility", meta = (AllowPrivateAccess = "true"))
 	float MaxStamina = 100.f;
@@ -109,9 +95,6 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerAbility", meta = (AllowPrivateAccess = "true"))
 	float MaxThirst = 90.f;
-	
-	UPROPERTY(Replicated, BlueprintReadOnly, Category = "PlayerAbility", meta = (AllowPrivateAccess = "true"))
-	float Health;
 
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "PlayerAbility", meta = (AllowPrivateAccess = "true"))
 	float Stamina;

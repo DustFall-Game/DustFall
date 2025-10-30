@@ -19,6 +19,7 @@ void ADF_PlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	AbilityComponent = FindComponentByClass<UPlayerAbilityComponent>();
+	MovementComponent = GetCharacterMovement();
 	PlayerController = Cast<APlayerController>(GetController());
 
 	if (HUDWidgetClass && PlayerController)
@@ -31,16 +32,14 @@ void ADF_PlayerCharacter::HandleSprint_Implementation(bool bIsSprint)
 {
 	if (!AbilityComponent) return;
 	
-	if (MovementComponent = GetCharacterMovement(); MovementComponent)
+	if (MovementComponent)
 	{
 		if (bIsSprint && (AbilityComponent->GetStamina() < 15.f || MovementComponent->Velocity.Size2D() < 10.0f))
 			return;
 
-		AbilityComponent->SetIsSprinting(bIsSprint);
-		MovementComponent->MaxWalkSpeed = bIsSprint ? 600.f : 300.f;
-
+		ServerHandleSprint(bIsSprint);
+		
 		auto& TimerManager = GetWorld()->GetTimerManager();
-
 		if (bIsSprint)
 		{
 			TimerManager.ClearTimer(StaminaRegenTimerHandle);
@@ -66,6 +65,14 @@ void ADF_PlayerCharacter::HandleSprint_Implementation(bool bIsSprint)
 				);
 		}
 	}
+}
+
+void ADF_PlayerCharacter::ServerHandleSprint_Implementation(bool bIsNewSprint)
+{
+	if (!AbilityComponent || !MovementComponent) return;
+
+	AbilityComponent->SetIsSprinting(bIsNewSprint);
+	MovementComponent->MaxWalkSpeed = bIsNewSprint ? 600.f : 300.f;
 }
 
 void ADF_PlayerCharacter::HandleDrainStamina()
