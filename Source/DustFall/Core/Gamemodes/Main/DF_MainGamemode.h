@@ -16,8 +16,7 @@ class DUSTFALL_API ADF_MainGamemode : public AGameModeBase
 
 public:
 	virtual void BeginPlay() override;
-	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override; 
-	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
 private:
 	void HandleAutoSave();

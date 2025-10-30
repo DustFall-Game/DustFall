@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DustFall/Saves/DF_SaveGame.h"
 #include "DustFall/Systems/Structures/SaveGameInfo.h"
 #include "UObject/Object.h"
 #include "SaveGameManager.generated.h"
@@ -16,7 +17,8 @@ class DUSTFALL_API USaveGameManager : public UObject
 	GENERATED_BODY()
 
 public:
-	static void SaveGame(FNewSaveGameInfo NewSaveGameInfo);
+	static UDF_SaveGame* GetSaveGame(UWorld* World);
+	static void SaveGame(const FNewSaveGameInfo& NewSaveGameInfo);
 	static TArray<FSaveGameInfo> GetAllSaveGames();
 	static int32 GetLevelIndex(UWorld* World);
 

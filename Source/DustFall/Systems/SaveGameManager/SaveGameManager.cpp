@@ -7,7 +7,26 @@
 #include "DustFall/Saves/DF_SaveGame.h"
 #include "Kismet/GameplayStatics.h"
 
-void USaveGameManager::SaveGame(FNewSaveGameInfo NewSaveGameInfo)
+
+UDF_SaveGame* USaveGameManager::GetSaveGame(UWorld* World)
+{
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("SaveGames");
+	TArray<FString> FoundFiles;
+	IFileManager::Get().FindFiles(FoundFiles, *SaveDir, TEXT("*.sav"));
+	
+	FString LevelPrefix = FString::Printf(TEXT("Autosave-%d"), GetLevelIndex(World));
+	FString* SaveFile = FoundFiles.FindByPredicate([&](const FString& FileName)
+	{
+		return FileName.StartsWith(LevelPrefix);
+	});
+	
+	if (!SaveFile)
+		return nullptr;
+
+	return Cast<UDF_SaveGame>(UGameplayStatics::LoadGameFromSlot(FPaths::GetBaseFilename(*SaveFile), 0));
+}
+
+void USaveGameManager::SaveGame(const FNewSaveGameInfo& NewSaveGameInfo)
 {
 	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("SaveGames");
 	IFileManager& FileManager = IFileManager::Get();

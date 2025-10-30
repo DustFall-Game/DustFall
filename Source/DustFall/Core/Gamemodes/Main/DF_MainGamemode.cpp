@@ -5,6 +5,7 @@
 #include "DustFall/Saves/DF_SaveGame.h"
 #include "DustFall/Systems/SaveGameManager/SaveGameManager.h"
 #include "DustFall/Systems/Structures/SaveGameInfo.h"
+#include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -24,53 +25,32 @@ void ADF_MainGamemode::BeginPlay()
 
 AActor* ADF_MainGamemode::ChoosePlayerStart_Implementation(AController* Player)
 {
-	return nullptr;
-}
-
-void ADF_MainGamemode::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
-{
-	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
-	if (!NewPlayer) return;
-	
 	FTransform SpawnTransform;
-	FString SaveSlotName;
-	const FString SaveDir = FPaths::ProjectSavedDir() / TEXT("SaveGames");
-	TArray<FString> FoundFiles;
-	IFileManager::Get().FindFiles(FoundFiles, *SaveDir, TEXT("*.sav"));
-
-	const FString LevelPrefix = FString::Printf(TEXT("Autosave-%d"), USaveGameManager::GetLevelIndex(GetWorld()));
-	for (const FString& FileName : FoundFiles)
+	
+	if (auto SaveGame = USaveGameManager::GetSaveGame(GetWorld()))
 	{
-		if (FileName.StartsWith(LevelPrefix))
-		{
-			SaveSlotName = FPaths::GetBaseFilename(FileName);
-			break;
-		}
+		SpawnTransform.SetLocation(SaveGame->PlayerLocation);
+		
+		return GetWorld()->SpawnActor<AActor>(APlayerStart::StaticClass(), SpawnTransform);
 	}
 	
-	if (!SaveSlotName.IsEmpty())
+	if (GetNumPlayers() == 0 || Player->IsLocalController())
 	{
-		if (auto LoadedGame = Cast<UDF_SaveGame>(UGameplayStatics::LoadGameFromSlot(SaveSlotName, 0)))
-			SpawnTransform.SetLocation(LoadedGame->PlayerLocation);
-	} else {
-		if (GetNumPlayers() == 0)
-		{
-			if (AActor* PlayerStart = ChoosePlayerStart(NewPlayer))
-				SpawnTransform = PlayerStart->GetActorTransform();
-		} else {
-			if (auto FounderPC = GetWorld()->GetFirstPlayerController())
-				if (auto
-					FounderPawn = FounderPC->GetPawn())
-				{
-					FVector FounderLocation = FounderPawn->GetActorLocation();
-					FVector Offset(FMath::RandRange(200.f, 400.f), FMath::RandRange(200.f, 400.f), 0.f);
-					SpawnTransform.SetLocation(FounderLocation + Offset);
-				}
-		}
+		TArray<AActor*> PlayerStarts;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), PlayerStarts);
+		if (PlayerStarts.Num())
+			return PlayerStarts[0];
 	}
 	
-	if (auto SpawnedPawn = SpawnDefaultPawnAtTransform(NewPlayer, SpawnTransform))
-		NewPlayer->Possess(SpawnedPawn);
+	if (auto FounderPawn = GetWorld()->GetFirstPlayerController()->GetPawn())
+	{
+		FVector Offset(FMath::RandRange(200.f, 400.f), FMath::RandRange(200.f, 400.f), 0.f);
+		SpawnTransform.SetLocation(FounderPawn->GetActorLocation() + Offset);
+		
+		return GetWorld()->SpawnActor<AActor>(APlayerStart::StaticClass(), SpawnTransform);
+	}
+	
+	return Super::ChoosePlayerStart_Implementation(Player);
 }
 
 void ADF_MainGamemode::HandleAutoSave()
