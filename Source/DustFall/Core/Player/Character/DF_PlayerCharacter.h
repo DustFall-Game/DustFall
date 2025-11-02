@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GenericTeamAgentInterface.h"
 #include "DustFall/Core/Player/Interfaces/InputToPlayerInterface.h"
 #include "GameFramework/Character.h"
 #include "DF_PlayerCharacter.generated.h"
@@ -11,7 +12,7 @@ class UBaseUserWidget;
 class UPlayerAbilityComponent;
 
 UCLASS()
-class DUSTFALL_API ADF_PlayerCharacter : public ACharacter, public IInputToPlayerInterface
+class DUSTFALL_API ADF_PlayerCharacter : public ACharacter, public IInputToPlayerInterface, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -44,6 +45,14 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI")
 	TSubclassOf<UBaseUserWidget> HUDWidgetClass;
+
+	UPROPERTY(EditAnywhere, Category="Team")
+	uint8 TeamIdValue = 1;
+	
+	virtual FGenericTeamId GetGenericTeamId() const override
+	{
+		return FGenericTeamId(TeamIdValue);
+	}
 
 private:
 	/** Timers */

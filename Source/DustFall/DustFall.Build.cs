@@ -6,6 +6,7 @@ public class DustFall : ModuleRules
 {
 	public DustFall(ReadOnlyTargetRules Target) : base(Target)
 	{
+		PrivateDependencyModuleNames.AddRange(new string[] { "AIModule", "NavigationSystem" });
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 		
 		PublicDependencyModuleNames.AddRange(new string[]
