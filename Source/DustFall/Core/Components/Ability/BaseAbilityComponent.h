@@ -8,6 +8,8 @@
 #include "BaseAbilityComponent.generated.h"
 
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDamageTaken);
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class DUSTFALL_API UBaseAbilityComponent : public UActorComponent, public IDamageInterface
 {
@@ -15,6 +17,10 @@ class DUSTFALL_API UBaseAbilityComponent : public UActorComponent, public IDamag
 
 public:
 	UBaseAbilityComponent();
+
+	/** Delegats */
+	UPROPERTY(BlueprintAssignable)
+	FOnDamageTaken OnDamageTaken;
 	
 	/** Implements */
 	virtual void TakeDamage_Implementation(float Damage, AActor* Character, FName Bone) override;

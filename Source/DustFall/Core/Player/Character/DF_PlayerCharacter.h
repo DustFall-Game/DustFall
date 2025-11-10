@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GenericTeamAgentInterface.h"
+#include "DustFall/AI/Enums/TeamType.h"
 #include "DustFall/Core/Player/Interfaces/InputToPlayerInterface.h"
 #include "GameFramework/Character.h"
 #include "DF_PlayerCharacter.generated.h"
@@ -47,11 +48,11 @@ protected:
 	TSubclassOf<UBaseUserWidget> HUDWidgetClass;
 
 	UPROPERTY(EditAnywhere, Category="Team")
-	uint8 TeamIdValue = 1;
+	ETeamType TeamType = ETeamType::Player;
 	
 	virtual FGenericTeamId GetGenericTeamId() const override
 	{
-		return FGenericTeamId(TeamIdValue);
+		return FGenericTeamId(static_cast<uint8>(TeamType));
 	}
 
 private:

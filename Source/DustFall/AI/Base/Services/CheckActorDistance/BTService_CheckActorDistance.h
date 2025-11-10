@@ -4,19 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/Services/BTService_BlackboardBase.h"
-#include "BT_ServiceCheckPlayerDistance.generated.h"
+#include "BTService_CheckActorDistance.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DUSTFALL_API UBT_ServiceCheckPlayerDistance : public UBTService_BlackboardBase
+class DUSTFALL_API UBTService_CheckActorDistance : public UBTService_BlackboardBase
 {
 	GENERATED_BODY()
 
 public:
-	UBT_ServiceCheckPlayerDistance();
+	UBTService_CheckActorDistance();
 
 protected:
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
+
+	UPROPERTY(EditAnywhere, Category="AI")
+	FBlackboardKeySelector TargetActorKey;
+
+	UPROPERTY(EditAnywhere, Category="AI")
+	FBlackboardKeySelector DistanceToTargetKey;
 };

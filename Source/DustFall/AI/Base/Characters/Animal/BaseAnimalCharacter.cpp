@@ -6,6 +6,7 @@
 #include "DustFall/AI/Base/Components/Ability/AIAbilityComponent.h"
 #include "DustFall/AI/Base/Controllers/Animal/BaseAnimalController.h"
 #include "DustFall/AI/DataAssets/AnimalDataAsset.h"
+#include "DustFall/AI/Enums/AnimalType.h"
 #include "DustFall/AI/Enums/AnimalState.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Perception/AIPerceptionComponent.h"
@@ -21,6 +22,22 @@ ABaseAnimalCharacter::ABaseAnimalCharacter()
 	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
 }
 
+void ABaseAnimalCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (GetController())
+		Blackboard = Cast<AAIController>(GetController())->GetBlackboardComponent();
+	
+	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ABaseAnimalCharacter::OnPerceptionUpdated);
+	AbilityComponent->OnDamageTaken.AddDynamic(this, &ABaseAnimalCharacter::OnDamageTaken);
+	
+	if (Blackboard)
+		Blackboard->SetValueAsEnum("AnimalType",
+			static_cast<uint8>(TeamToAnimal(AnimalDataAsset ? AnimalDataAsset->TeamType : ETeamType::None))
+		);
+}
+
 void ABaseAnimalCharacter::HandleSprint_Implementation(bool bIsSprint)
 {
 	if (!AnimalDataAsset) return;
@@ -30,6 +47,51 @@ void ABaseAnimalCharacter::HandleSprint_Implementation(bool bIsSprint)
 			MovementComponent->MaxWalkSpeed = AnimalDataAsset->SprintSpeed;
 		else
 			MovementComponent->MaxWalkSpeed = AnimalDataAsset->WalkSpeed;
+}
+
+void ABaseAnimalCharacter::OnPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
+{
+    if (!Actor || !Blackboard || !AnimalDataAsset) return;
+
+    FString SenseName = Stimulus.Type.Name.ToString();
+    if (SenseName.Contains("AISense_Sight") && AnimalDataAsset->bReactToSight)
+    {
+    	if (Stimulus.WasSuccessfullySensed())
+    	{
+    		if (!Blackboard->GetValueAsObject("TargetActor"))
+    			Blackboard->SetValueAsObject("TargetActor", Actor);
+    		
+    		if (Blackboard->GetValueAsEnum("AnimalState") != static_cast<uint8>(EAnimalState::Flee))
+    			Blackboard->SetValueAsEnum("AnimalState", static_cast<uint8>(EAnimalState::Alert));
+    	}
+    	
+    	else if (Blackboard->GetValueAsObject("TargetActor") == Actor)
+        {
+  			Blackboard->ClearValue("TargetActor");
+	  
+        	if (Blackboard->GetValueAsEnum("AnimalState") != static_cast<uint8>(EAnimalState::Flee))
+        		Blackboard->ClearValue("AnimalState");      		
+        }
+    }
+    
+    else if (SenseName.Contains("AISense_Hearing") && AnimalDataAsset->bReactToHearing)
+    {
+        if (Stimulus.WasSuccessfullySensed())
+            Blackboard->SetValueAsEnum("AnimalState", static_cast<uint8>(EAnimalState::Alert));
+    }
+}
+
+void ABaseAnimalCharacter::OnDamageTaken()
+{
+	if (!Blackboard) return;
+	
+	if (AnimalDataAsset->bReactToDamage)
+		Blackboard->SetValueAsEnum("AnimalState", static_cast<uint8>(EAnimalState::Flee));
+	else
+		Blackboard->SetValueAsEnum("AnimalState", static_cast<uint8>(EAnimalState::Alert));
+
+	if (AnimalDataAsset->bAttackOnDamage)
+		Blackboard->SetValueAsBool("bCanAttack", true);
 }
 
 void ABaseAnimalCharacter::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const
@@ -44,41 +106,18 @@ void ABaseAnimalCharacter::GetActorEyesViewPoint(FVector& OutLocation, FRotator&
 	}
 }
 
-void ABaseAnimalCharacter::BeginPlay()
+EAnimalType ABaseAnimalCharacter::TeamToAnimal(ETeamType Team)
 {
-	Super::BeginPlay();
-
-	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ABaseAnimalCharacter::OnPerceptionUpdated);
-}
-
-void ABaseAnimalCharacter::OnPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
-{
-	if (!Actor) return;
-
-	auto Blackboard = Cast<AAIController>(GetController())->GetBlackboardComponent();
-	if (!Blackboard) return;
-	
-	FString SenseName = Stimulus.Type.Name.ToString();
-	if (SenseName.Contains("AISense_Sight"))
+	switch (Team)
 	{
-		if (Stimulus.WasSuccessfullySensed())
-		{
-			Blackboard->SetValueAsObject("TargetActor", Actor);
-			Blackboard->SetValueAsEnum("AnimalState", static_cast<uint8>(EAnimalState::Alert));
-		} else {
-			Blackboard->ClearValue("TargetActor");
-			
-			if (Blackboard->GetValueAsEnum("AnimalState") != static_cast<uint8>(EAnimalState::Flee))
-				Blackboard->ClearValue("AnimalState");
-		}
-	}
-	else if (SenseName.Contains("AISense_Hearing"))
-	{
-		if (Stimulus.WasSuccessfullySensed())
-		{
-			UE_LOG(LogTemp, Display, TEXT("Hearing detected: %s"), *Actor->GetName());
-		} else {
-			UE_LOG(LogTemp, Display, TEXT("Hearing lost: %s"), *Actor->GetName());
-		}
+		case ETeamType::Fox: return EAnimalType::Fox;
+		case ETeamType::Pig: return EAnimalType::Pig;
+		case ETeamType::Deer: return EAnimalType::Deer;
+		case ETeamType::Wolf: return EAnimalType::Wolf;
+		case ETeamType::Bear: return EAnimalType::Bear;
+		case ETeamType::Boar: return EAnimalType::Boar;
+		case ETeamType::Rabbit: return EAnimalType::Rabbit;
+
+		default: return EAnimalType::None;
 	}
 }

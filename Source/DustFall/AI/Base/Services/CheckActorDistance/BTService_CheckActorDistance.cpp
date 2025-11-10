@@ -1,19 +1,19 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "BT_ServiceCheckPlayerDistance.h"
+#include "BTService_CheckActorDistance.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Character.h"
 
-UBT_ServiceCheckPlayerDistance::UBT_ServiceCheckPlayerDistance()
+UBTService_CheckActorDistance::UBTService_CheckActorDistance()
 {
-	NodeName = "Check Player Distance";
+	NodeName = "Check Actor Distance";
 	Interval = 0.5f;
 	RandomDeviation = 0.1f;
 }
 
-void UBT_ServiceCheckPlayerDistance::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+void UBTService_CheckActorDistance::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
@@ -26,9 +26,9 @@ void UBT_ServiceCheckPlayerDistance::TickNode(UBehaviorTreeComponent& OwnerComp,
 	auto Blackboard = AIController->GetBlackboardComponent();
 	if (!Blackboard) return;
 
-	auto Character = Cast<ACharacter>(Blackboard->GetValueAsObject("TargetActor"));
+	auto Character = Cast<ACharacter>(Blackboard->GetValueAsObject(TargetActorKey.SelectedKeyName));
 	if (!Character) return;
 
 	float DistanceToTarget = AIPawn->GetDistanceTo(Character);
-	Blackboard->SetValueAsFloat("DistanceToTarget", DistanceToTarget);
+	Blackboard->SetValueAsFloat(DistanceToTargetKey.SelectedKeyName, DistanceToTarget);
 }

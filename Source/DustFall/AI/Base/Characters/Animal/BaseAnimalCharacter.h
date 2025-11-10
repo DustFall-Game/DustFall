@@ -4,7 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GenericTeamAgentInterface.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "DustFall/AI/Base/Interfaces/AIMovementInterface.h"
+#include "DustFall/AI/DataAssets/AnimalDataAsset.h"
+#include "DustFall/AI/Enums/AnimalType.h"
+#include "DustFall/AI/Enums/TeamType.h"
 #include "GameFramework/Character.h"
 #include "BaseAnimalCharacter.generated.h"
 
@@ -20,7 +24,7 @@ class DUSTFALL_API ABaseAnimalCharacter : public ACharacter, public IGenericTeam
 
 public:
 	ABaseAnimalCharacter();
-
+	
 	/** Interfaces */
 	virtual void HandleSprint_Implementation(bool bIsSprint) override;
 
@@ -31,21 +35,27 @@ protected:
 	UFUNCTION()
 	virtual void OnPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
+	UFUNCTION()
+	virtual void OnDamageTaken();
+
 	/** References */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UBlackboardComponent* Blackboard;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAIAbilityComponent* AbilityComponent;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAIPerceptionComponent* PerceptionComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, Category="Assets")
 	UAnimalDataAsset* AnimalDataAsset;
-
-	UPROPERTY(EditAnywhere, Category="Team")
-	uint8 TeamIdValue = 2;
 	
 	virtual FGenericTeamId GetGenericTeamId() const override
 	{
-		return FGenericTeamId(TeamIdValue);
+		return FGenericTeamId(static_cast<uint8>(AnimalDataAsset ? AnimalDataAsset->TeamType : ETeamType::None));
 	}
+
+private:
+	static EAnimalType TeamToAnimal(ETeamType Team);
 };
