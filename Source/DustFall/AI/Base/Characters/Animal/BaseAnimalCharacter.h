@@ -12,6 +12,8 @@
 #include "GameFramework/Character.h"
 #include "BaseAnimalCharacter.generated.h"
 
+class UAISenseConfig_Hearing;
+class UAISenseConfig_Sight;
 class UAnimalDataAsset;
 struct FAIStimulus;
 class UAIPerceptionComponent;
@@ -47,6 +49,12 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAIPerceptionComponent* PerceptionComponent;
+
+	UPROPERTY()
+	UAISenseConfig_Sight* SightConfig;
+
+	UPROPERTY()
+	UAISenseConfig_Hearing* HearingConfig;
 
 	UPROPERTY(EditAnywhere, Category="Assets")
 	UAnimalDataAsset* AnimalDataAsset;

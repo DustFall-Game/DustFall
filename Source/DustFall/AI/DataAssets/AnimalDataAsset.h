@@ -61,4 +61,8 @@ public:
 	/** Периферическое зрение */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Perception Sight")
 	float PeripheralVision = 110.f;
+
+	/** Максимальная зона где слышит */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Perception Sight")
+	float HearingRadius = 3000.f;
 };

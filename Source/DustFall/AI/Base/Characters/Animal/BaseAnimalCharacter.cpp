@@ -11,6 +11,8 @@
 #include "DustFall/Core/Player/Character/DF_PlayerCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Perception/AIPerceptionComponent.h"
+#include "Perception/AISenseConfig_Hearing.h"
+#include "Perception/AISenseConfig_Sight.h"
 #include "Perception/AISense_Sight.h"
 
 
@@ -21,6 +23,9 @@ ABaseAnimalCharacter::ABaseAnimalCharacter()
 	AIControllerClass = ABaseAnimalController::StaticClass();
 	AbilityComponent = CreateDefaultSubobject<UAIAbilityComponent>(TEXT("AbilityComponent"));
 	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
+
+	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
+	HearingConfig = CreateDefaultSubobject<UAISenseConfig_Hearing>(TEXT("HearingConfig"));
 }
 
 void ABaseAnimalCharacter::BeginPlay()
@@ -30,13 +35,29 @@ void ABaseAnimalCharacter::BeginPlay()
 	if (GetController())
 		Blackboard = Cast<AAIController>(GetController())->GetBlackboardComponent();
 	
-	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ABaseAnimalCharacter::OnPerceptionUpdated);
-	AbilityComponent->OnDamageTaken.AddDynamic(this, &ABaseAnimalCharacter::OnDamageTaken);
-	
 	if (Blackboard)
 		Blackboard->SetValueAsEnum("AnimalType",
 			static_cast<uint8>(TeamToAnimal(AnimalDataAsset ? AnimalDataAsset->TeamType : ETeamType::None))
 		);
+
+	if (!AnimalDataAsset || !PerceptionComponent) return;
+	
+	SightConfig->SightRadius = AnimalDataAsset->SightRadius;
+	SightConfig->LoseSightRadius = AnimalDataAsset->LoseSightRadius;
+	SightConfig->PeripheralVisionAngleDegrees = AnimalDataAsset->PeripheralVision;
+
+	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
+	SightConfig->DetectionByAffiliation.bDetectFriendlies = false;
+	SightConfig->DetectionByAffiliation.bDetectNeutrals = false;
+	
+	HearingConfig->HearingRange = AnimalDataAsset->HearingRadius;
+	
+	PerceptionComponent->ConfigureSense(*SightConfig);
+	PerceptionComponent->ConfigureSense(*HearingConfig);
+	PerceptionComponent->SetDominantSense(SightConfig->GetSenseImplementation());
+
+	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ABaseAnimalCharacter::OnPerceptionUpdated);
+	AbilityComponent->OnDamageTaken.AddDynamic(this, &ABaseAnimalCharacter::OnDamageTaken);
 }
 
 void ABaseAnimalCharacter::HandleSprint_Implementation(bool bIsSprint)
