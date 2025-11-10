@@ -8,6 +8,7 @@
 #include "DustFall/AI/DataAssets/AnimalDataAsset.h"
 #include "DustFall/AI/Enums/AnimalType.h"
 #include "DustFall/AI/Enums/AnimalState.h"
+#include "DustFall/Core/Player/Character/DF_PlayerCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISense_Sight.h"
@@ -51,7 +52,7 @@ void ABaseAnimalCharacter::HandleSprint_Implementation(bool bIsSprint)
 
 void ABaseAnimalCharacter::OnPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
-    if (!Actor || !Blackboard || !AnimalDataAsset) return;
+    if (!Actor || !Blackboard || !AnimalDataAsset || !Cast<ADF_PlayerCharacter>(Actor)) return;
 
     FString SenseName = Stimulus.Type.Name.ToString();
     if (SenseName.Contains("AISense_Sight") && AnimalDataAsset->bReactToSight)
