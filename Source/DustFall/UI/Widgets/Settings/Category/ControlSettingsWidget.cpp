@@ -20,7 +20,10 @@ void UControlSettingsWidget::NativeConstruct()
 	if (ULocalPlayer* LocalPlayer = GetOwningPlayer()->GetLocalPlayer())
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>()) {
 			auto InputUserSettings = Subsystem->GetUserSettings();
-			auto KeyMappingRowsMap = InputUserSettings->GetCurrentKeyProfile()->GetPlayerMappingRows();
+			auto ActiveProfile = InputUserSettings->GetActiveKeyProfile();
+			if (!ActiveProfile) return;
+			
+			auto& KeyMappingRowsMap = ActiveProfile->GetPlayerMappingRows();
 
 			TArray<FKeyMappingRow> KeyMappingArray;
 			KeyMappingRowsMap.GenerateValueArray(KeyMappingArray);

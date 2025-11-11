@@ -1,4 +1,4 @@
 [submodule "Plugins/AdvancedSessions"]
 	path = Plugins/AdvancedSessions
 	url = https://github.com/mordentral/AdvancedSessionsPlugin.git
-	branch = 5.4-Locked
+	branch = 5.6-Locked

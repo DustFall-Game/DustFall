@@ -132,10 +132,10 @@ void UScreenSettingsWidget::InitScreenSettings()
 		}
 		if (Slider_Dlss_Sharpness)
 		{
-			const float DlssSharpness = UDLSSLibrary::GetDLSSSharpness();
+			//const float DlssSharpness = UDLSSLibrary::GetDLSSSharpness();
 			Slider_Dlss_Sharpness->SetMinValue(0);
 			Slider_Dlss_Sharpness->SetMaxValue(1);
-			Slider_Dlss_Sharpness->SetValue(DlssSharpness);
+			//Slider_Dlss_Sharpness->SetValue(DlssSharpness);
 		}
 	}
 	else

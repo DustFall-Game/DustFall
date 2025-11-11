@@ -13,7 +13,6 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Hearing.h"
 #include "Perception/AISenseConfig_Sight.h"
-#include "Perception/AISense_Sight.h"
 
 
 ABaseAnimalCharacter::ABaseAnimalCharacter()
@@ -25,7 +24,6 @@ ABaseAnimalCharacter::ABaseAnimalCharacter()
 	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
 
 	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
-	HearingConfig = CreateDefaultSubobject<UAISenseConfig_Hearing>(TEXT("HearingConfig"));
 }
 
 void ABaseAnimalCharacter::BeginPlay()
@@ -50,10 +48,7 @@ void ABaseAnimalCharacter::BeginPlay()
 	SightConfig->DetectionByAffiliation.bDetectFriendlies = false;
 	SightConfig->DetectionByAffiliation.bDetectNeutrals = false;
 	
-	HearingConfig->HearingRange = AnimalDataAsset->HearingRadius;
-	
 	PerceptionComponent->ConfigureSense(*SightConfig);
-	PerceptionComponent->ConfigureSense(*HearingConfig);
 	PerceptionComponent->SetDominantSense(SightConfig->GetSenseImplementation());
 
 	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ABaseAnimalCharacter::OnPerceptionUpdated);

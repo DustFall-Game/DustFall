@@ -53,9 +53,6 @@ protected:
 	UPROPERTY()
 	UAISenseConfig_Sight* SightConfig;
 
-	UPROPERTY()
-	UAISenseConfig_Hearing* HearingConfig;
-
 	UPROPERTY(EditAnywhere, Category="Assets")
 	UAnimalDataAsset* AnimalDataAsset;
 	

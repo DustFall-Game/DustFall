@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "5.4",
+	"EngineAssociation": "5.6",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -201,6 +201,10 @@
 		},
 		{
 			"Name": "SteamSockets",
+			"Enabled": true
+		},
+		{
+			"Name": "DaySequence",
 			"Enabled": true
 		}
 	]

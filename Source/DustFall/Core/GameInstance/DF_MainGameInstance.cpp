@@ -87,7 +87,6 @@ void UDF_MainGameInstance::AdvancedCreateSession(const FString& SessionName)
 		false,
 		true,
 		true,
-		true,
 		false,
 		false,
 		false,
@@ -129,7 +128,6 @@ UFindSessionsCallbackProxyAdvanced* UDF_MainGameInstance::AdvancedFindSessions(c
 		false,
 		false,
 		false,
-		true,
 		0);
 }
 
