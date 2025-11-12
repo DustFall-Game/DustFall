@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GenericTeamAgentInterface.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Components/SphereComponent.h"
 #include "DustFall/AI/Base/Interfaces/AIMovementInterface.h"
 #include "DustFall/AI/DataAssets/AnimalDataAsset.h"
 #include "DustFall/AI/Enums/AnimalType.h"
@@ -40,6 +41,11 @@ protected:
 	UFUNCTION()
 	virtual void OnDamageTaken();
 
+	UFUNCTION()
+	void OnDetectOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+		bool bFromSweep, const FHitResult& SweepResult);
+
 	/** References */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UBlackboardComponent* Blackboard;
@@ -49,6 +55,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAIPerceptionComponent* PerceptionComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USphereComponent* DetectSphere;
 
 	UPROPERTY()
 	UAISenseConfig_Sight* SightConfig;

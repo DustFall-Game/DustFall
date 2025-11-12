@@ -22,8 +22,14 @@ ABaseAnimalCharacter::ABaseAnimalCharacter()
 	AIControllerClass = ABaseAnimalController::StaticClass();
 	AbilityComponent = CreateDefaultSubobject<UAIAbilityComponent>(TEXT("AbilityComponent"));
 	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
-
 	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
+
+	DetectSphere = CreateDefaultSubobject<USphereComponent>(TEXT("DetectSphere"));
+	DetectSphere->SetupAttachment(RootComponent);
+	DetectSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	DetectSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	DetectSphere->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Overlap);
+	DetectSphere->InitSphereRadius(300.f);
 }
 
 void ABaseAnimalCharacter::BeginPlay()
@@ -38,7 +44,7 @@ void ABaseAnimalCharacter::BeginPlay()
 			static_cast<uint8>(TeamToAnimal(AnimalDataAsset ? AnimalDataAsset->TeamType : ETeamType::None))
 		);
 
-	if (!AnimalDataAsset || !PerceptionComponent) return;
+	if (!AnimalDataAsset || !PerceptionComponent || !DetectSphere) return;
 	
 	SightConfig->SightRadius = AnimalDataAsset->SightRadius;
 	SightConfig->LoseSightRadius = AnimalDataAsset->LoseSightRadius;
@@ -53,6 +59,9 @@ void ABaseAnimalCharacter::BeginPlay()
 
 	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ABaseAnimalCharacter::OnPerceptionUpdated);
 	AbilityComponent->OnDamageTaken.AddDynamic(this, &ABaseAnimalCharacter::OnDamageTaken);
+	DetectSphere->OnComponentBeginOverlap.AddDynamic(this, &ABaseAnimalCharacter::OnDetectOverlap);
+
+	DetectSphere->SetSphereRadius(AnimalDataAsset->DetectRadius);
 }
 
 void ABaseAnimalCharacter::HandleSprint_Implementation(bool bIsSprint)
@@ -109,6 +118,18 @@ void ABaseAnimalCharacter::OnDamageTaken()
 
 	if (AnimalDataAsset->bAttackOnDamage)
 		Blackboard->SetValueAsBool("bCanAttack", true);
+}
+
+void ABaseAnimalCharacter::OnDetectOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (!OtherActor || OtherActor == this || !Cast<ADF_PlayerCharacter>(OtherActor)) return;
+
+	if (!Blackboard->GetValueAsObject("TargetActor"))
+		Blackboard->SetValueAsObject("TargetActor", OtherActor);
+    		
+	if (Blackboard->GetValueAsEnum("AnimalState") != static_cast<uint8>(EAnimalState::Flee))
+		Blackboard->SetValueAsEnum("AnimalState", static_cast<uint8>(EAnimalState::Alert));
 }
 
 void ABaseAnimalCharacter::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const

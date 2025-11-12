@@ -50,6 +50,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Perception")
 	bool bAttackOnDamage = true;
 
+	/** Радиус в котором гарантированно обнаруживает животное */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Perception")
+	float DetectRadius = 300.f;
+
 	/** Максимальная зона где может увидеть */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Perception Sight")
 	float SightRadius = 2000.f;
