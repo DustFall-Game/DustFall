@@ -10,11 +10,14 @@
 #include "GameFramework/Character.h"
 #include "UserSettings/EnhancedInputUserSettings.h"
 
+ADF_PlayerController::ADF_PlayerController()
+{
+	UIManager = CreateDefaultSubobject<UUIManager>(TEXT("UIManager"));
+}
+
 void ADF_PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	UIManager = FindComponentByClass<UUIManager>();
 	
 	ControlledCharacter = Cast<ACharacter>(GetPawn());
 	UserSettings = Cast<UDF_UserSettings>(GEngine->GetGameUserSettings());

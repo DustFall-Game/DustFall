@@ -17,6 +17,9 @@ class DUSTFALL_API ADF_PlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
+public:
+	ADF_PlayerController();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;

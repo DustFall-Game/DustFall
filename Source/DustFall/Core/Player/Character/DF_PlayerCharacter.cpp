@@ -2,8 +2,6 @@
 
 
 #include "DF_PlayerCharacter.h"
-
-#include "Blueprint/UserWidget.h"
 #include "DustFall/Core/Player/Components/Ability/PlayerAbilityComponent.h"
 #include "DustFall/UI/Manager/UIManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -12,13 +10,14 @@
 ADF_PlayerCharacter::ADF_PlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
+	
+	AbilityComponent = CreateDefaultSubobject<UPlayerAbilityComponent>(TEXT("AbilityComponent"));
 }
 
 void ADF_PlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	AbilityComponent = FindComponentByClass<UPlayerAbilityComponent>();
+	
 	MovementComponent = GetCharacterMovement();
 	PlayerController = Cast<APlayerController>(GetController());
 

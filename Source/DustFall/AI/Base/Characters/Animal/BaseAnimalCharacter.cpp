@@ -29,7 +29,7 @@ ABaseAnimalCharacter::ABaseAnimalCharacter()
 	DetectSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	DetectSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	DetectSphere->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Overlap);
-	DetectSphere->InitSphereRadius(300.f);
+	DetectSphere->InitSphereRadius(150.f);
 }
 
 void ABaseAnimalCharacter::BeginPlay()
@@ -49,6 +49,7 @@ void ABaseAnimalCharacter::BeginPlay()
 	SightConfig->SightRadius = AnimalDataAsset->SightRadius;
 	SightConfig->LoseSightRadius = AnimalDataAsset->LoseSightRadius;
 	SightConfig->PeripheralVisionAngleDegrees = AnimalDataAsset->PeripheralVision;
+	SightConfig->SetMaxAge(3.f);
 
 	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
 	SightConfig->DetectionByAffiliation.bDetectFriendlies = false;

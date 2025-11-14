@@ -35,7 +35,7 @@ protected:
 	void HandleRegenStamina();
 
 	/** References */
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UPlayerAbilityComponent* AbilityComponent;
 
 	UPROPERTY()
