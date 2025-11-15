@@ -16,6 +16,24 @@ enum class EWeatherType : uint8
 	Fog
 };
 
+USTRUCT(BlueprintType)
+struct FWorldState
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite)
+	float DayTime;
+
+	UPROPERTY(BlueprintReadWrite)
+	EWeatherType CurrentWeather;
+
+	UPROPERTY(BlueprintReadWrite)
+	float CurrentWeatherDuration;
+
+	UPROPERTY(BlueprintReadWrite)
+	float CurrentWeatherTargetDuration;
+};
+
 UCLASS()
 class DUSTFALL_API AWorldManager : public AActor
 {
@@ -23,6 +41,9 @@ class DUSTFALL_API AWorldManager : public AActor
 
 public:
 	AWorldManager();
+	
+	/** Function for obtaining the state of the world */
+	virtual FWorldState GetWorldState() const;
 
 protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
@@ -35,7 +56,6 @@ protected:
 	ASunMoonDaySequenceActor* DaySequenceActor;
 
 private:
-	float WeatherTimer;
 	float CurrentWeatherDuration;
 	float CurrentWeatherTargetDuration;
 	float MinWeatherDuration;

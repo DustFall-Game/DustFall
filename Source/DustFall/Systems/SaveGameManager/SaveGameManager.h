@@ -18,7 +18,7 @@ class DUSTFALL_API USaveGameManager : public UObject
 
 public:
 	static UDF_SaveGame* GetSaveGame(UWorld* World);
-	static void SaveGame(const FNewSaveGameInfo& NewSaveGameInfo);
+	static void SaveGame(UWorld* World);
 	static TArray<FSaveGameInfo> GetAllSaveGames();
 	static int32 GetLevelIndex(UWorld* World);
 

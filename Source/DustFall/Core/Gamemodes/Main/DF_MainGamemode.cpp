@@ -55,28 +55,5 @@ AActor* ADF_MainGamemode::ChoosePlayerStart_Implementation(AController* Player)
 
 void ADF_MainGamemode::HandleAutoSave()
 {
-	UWorld* World = GetWorld();
-	if (!World) return;
-
-	auto PC = UGameplayStatics::GetPlayerController(World, 0);
-	if (!PC || !PC->IsLocalController())
-		return;
-
-	FNewSaveGameInfo NewSaveGameInfo;
-	NewSaveGameInfo.SaveSlotName = TEXT("Autosave");
-
-	int32 LevelIndex = USaveGameManager::GetLevelIndex(World);
-	if (LevelIndex < 0)
-		return;
-
-	NewSaveGameInfo.PlayerLevel = LevelIndex;
-	
-	if (auto Pawn = PC->GetPawn())
-	{
-		NewSaveGameInfo.PlayerLocation = Pawn->GetActorLocation();
-		UE_LOG(LogTemp, Display, TEXT("Автосейв: %s на уровне %d"),
-		*NewSaveGameInfo.PlayerLocation.ToString(), LevelIndex);
-	}
-
-	USaveGameManager::SaveGame(NewSaveGameInfo);
+	USaveGameManager::SaveGame(GetWorld());
 }

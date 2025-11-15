@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DustFall/Systems/WorldManager/WorldManager.h"
 #include "GameFramework/SaveGame.h"
 #include "DF_SaveGame.generated.h"
 
@@ -29,4 +30,17 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	FVector PlayerLocation;
+
+	/** World Manager */
+	UPROPERTY(BlueprintReadOnly)
+	float DayTime;
+
+	UPROPERTY(BlueprintReadOnly)
+	float CurrentWeatherDuration;
+
+	UPROPERTY(BlueprintReadOnly)
+	float CurrentWeatherTargetDuration;
+
+	UPROPERTY(BlueprintReadOnly)
+	EWeatherType CurrentWeather;
 };

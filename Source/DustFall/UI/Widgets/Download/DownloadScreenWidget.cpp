@@ -32,11 +32,14 @@ void UDownloadScreenWidget::NativeConstruct()
 		
 		Widget->Text_SaveData->SetText(FText::FromString(SaveInfo.SaveDate.ToString(TEXT("%Y-%m-%d %H:%M:%S"))));
 
-		FSlateBrush Brush;
-		Brush.SetResourceObject(SaveInfo.SaveScreenshot);
-		Brush.ImageSize = FVector2D(512.f, 190.f);
-		
-		Widget->Img_SaveScreenshot->SetBrush(Brush);
+		if (SaveInfo.SaveScreenshot)
+		{
+			FSlateBrush Brush;
+			Brush.SetResourceObject(SaveInfo.SaveScreenshot);
+			Brush.ImageSize = FVector2D(512.f, 190.f);
+			
+			Widget->Img_SaveScreenshot->SetBrush(Brush);			
+		}
 
 		SB_Saves->AddChild(Widget);
 	}

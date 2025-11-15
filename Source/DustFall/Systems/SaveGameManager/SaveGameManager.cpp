@@ -14,7 +14,7 @@ UDF_SaveGame* USaveGameManager::GetSaveGame(UWorld* World)
 	TArray<FString> FoundFiles;
 	IFileManager::Get().FindFiles(FoundFiles, *SaveDir, TEXT("*.sav"));
 	
-	FString LevelPrefix = FString::Printf(TEXT("Autosave-%d"), GetLevelIndex(World));
+	FString LevelPrefix = FString::Printf(TEXT("Save-%d"), GetLevelIndex(World));
 	FString* SaveFile = FoundFiles.FindByPredicate([&](const FString& FileName)
 	{
 		return FileName.StartsWith(LevelPrefix);
@@ -23,17 +23,32 @@ UDF_SaveGame* USaveGameManager::GetSaveGame(UWorld* World)
 	if (!SaveFile)
 		return nullptr;
 
-	return Cast<UDF_SaveGame>(UGameplayStatics::LoadGameFromSlot(FPaths::GetBaseFilename(*SaveFile), 0));
+	if (auto Save = UGameplayStatics::LoadGameFromSlot(FPaths::GetBaseFilename(*SaveFile), 0))
+		return Cast<UDF_SaveGame>(Save);
+
+	return nullptr;
 }
 
-void USaveGameManager::SaveGame(const FNewSaveGameInfo& NewSaveGameInfo)
+void USaveGameManager::SaveGame(UWorld* World)
 {
-	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("SaveGames");
+	if (!World) return;
+	
+	auto PC = UGameplayStatics::GetPlayerController(World, 0);
+	if (!PC || !PC->IsLocalController())
+		return;
+
+	/** Get level Index */
+	const int32 LevelIndex = GetLevelIndex(World);
+	if (LevelIndex < 0) return;
+	
+	const FString LevelPrefix = FString::Printf(TEXT("Save-%d"), LevelIndex);
+
+	/** Get Directory save files */
+	const FString SaveDir = FPaths::ProjectSavedDir() / TEXT("SaveGames");
 	IFileManager& FileManager = IFileManager::Get();
-	
-	FString LevelPrefix = FString::Printf(TEXT("Autosave-%d"), NewSaveGameInfo.PlayerLevel);
+
+	/** Find existing save file*/
 	FString ExistingSaveFile;
-	
 	TArray<FString> FoundFiles;
 	FileManager.FindFiles(FoundFiles, *SaveDir, TEXT("*.sav"));
 	for (const FString& FileName : FoundFiles)
@@ -44,24 +59,36 @@ void USaveGameManager::SaveGame(const FNewSaveGameInfo& NewSaveGameInfo)
 			break;
 		}
 	}
-	
-	int64 TimeStamp = FDateTime::UtcNow().ToUnixTimestamp() * 1000 + FDateTime::UtcNow().GetMillisecond();
-	FString UniqueSaveSlotName = LevelPrefix + FString::Printf(TEXT("%lld"), TimeStamp);
+
+	/** Create Unique slot name */
+	const int64 TimeStamp = FDateTime::UtcNow().ToUnixTimestamp() * 1000 + FDateTime::UtcNow().GetMillisecond();
+	const FString UniqueSaveSlotName = LevelPrefix + FString::Printf(TEXT("%lld"), TimeStamp);
 
 	auto SaveGameInstance = Cast<UDF_SaveGame>(UGameplayStatics::CreateSaveGameObject(UDF_SaveGame::StaticClass()));
 	if (!SaveGameInstance) return;
 
 	SaveGameInstance->SaveDate = FDateTime::Now();
 	SaveGameInstance->SaveName = UniqueSaveSlotName;
-	SaveGameInstance->PlayerLevel = NewSaveGameInfo.PlayerLevel;
-	SaveGameInstance->PlayerLocation = NewSaveGameInfo.PlayerLocation;
+	SaveGameInstance->PlayerLevel = LevelIndex;
+	SaveGameInstance->PlayerLocation = PC->GetPawn() ?
+		PC->GetPawn()->GetActorLocation() : FVector(0, 0, 50);
+
+	if (auto WorldManager = Cast<AWorldManager>(UGameplayStatics::GetActorOfClass(World, AWorldManager::StaticClass())))
+	{
+		const FWorldState State = WorldManager->GetWorldState();
+		SaveGameInstance->DayTime = State.DayTime;
+		SaveGameInstance->CurrentWeather = State.CurrentWeather;
+		SaveGameInstance->CurrentWeatherDuration = State.CurrentWeatherDuration;
+		SaveGameInstance->CurrentWeatherTargetDuration = State.CurrentWeatherTargetDuration;		
+	}
 	
 	FString ScreenshotPath = SaveDir / (UniqueSaveSlotName + TEXT(".png"));
 	SaveScreenshotToFile(ScreenshotPath);
 	SaveGameInstance->ScreenshotPath = ScreenshotPath;
 	
 	UGameplayStatics::SaveGameToSlot(SaveGameInstance, UniqueSaveSlotName, 0);
-	
+
+	/** If the save file exists, delete it and write a new one */
 	if (!ExistingSaveFile.IsEmpty())
 	{
 		FileManager.Delete(*(SaveDir / ExistingSaveFile));

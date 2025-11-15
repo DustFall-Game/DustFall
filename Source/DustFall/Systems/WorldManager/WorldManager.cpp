@@ -3,15 +3,13 @@
 
 #include "WorldManager.h"
 #include "EngineUtils.h"
+#include "DustFall/Systems/SaveGameManager/SaveGameManager.h"
 
 AWorldManager::AWorldManager()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	PrimaryActorTick.bStartWithTickEnabled = true;
 
 	CurrentWeather = EWeatherType::Sunny;
-	
-	WeatherTimer = 0.f;
 	CurrentWeatherDuration = 0.f;
 	CurrentWeatherTargetDuration = 0.f;
 	MinWeatherDuration = 6.f;  // 10m = 600.f
@@ -38,10 +36,9 @@ void AWorldManager::OnConstruction(const FTransform& Transform)
 	if (DaySequenceActor)
 	{
 		DaySequenceActor->SetDayLength(24.f);
-		DaySequenceActor->SetTimePerCycle(0.66f); // 40m / 60m
+		DaySequenceActor->SetTimePerCycle(0.66f); // 40m in Real Life / 1h(60m)
 		DaySequenceActor->SetInitialTimeOfDay(8.f);
 		DaySequenceActor->SetRunDayCycle(true);
-		DaySequenceActor->Play();
 	}
 }
 
@@ -51,13 +48,22 @@ void AWorldManager::BeginPlay()
 	Super::BeginPlay();
 
 	CurrentWeatherTargetDuration = FMath::RandRange(MinWeatherDuration, MaxWeatherDuration);
+	
+	if (auto SaveGame = USaveGameManager::GetSaveGame(GetWorld()))
+	{
+		CurrentWeather = SaveGame->CurrentWeather;
+		CurrentWeatherDuration = SaveGame->CurrentWeatherDuration;
+		CurrentWeatherTargetDuration = SaveGame->CurrentWeatherTargetDuration;
+		
+		DaySequenceActor->SetTimeOfDay(SaveGame->DayTime);
+		DaySequenceActor->Play();
+	}
 }
 
 void AWorldManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	WeatherTimer += DeltaTime;
 	CurrentWeatherDuration += DeltaTime;
 	
 	if (CurrentWeatherDuration >= CurrentWeatherTargetDuration)
@@ -74,6 +80,17 @@ void AWorldManager::SetWeather(EWeatherType NewWeather)
 	if (NewWeather == CurrentWeather) return;
 
 	CurrentWeather = NewWeather;
+}
+
+FWorldState AWorldManager::GetWorldState() const
+{
+	FWorldState State;
+	State.DayTime = DaySequenceActor->GetTimeOfDay();
+	State.CurrentWeather = CurrentWeather;
+	State.CurrentWeatherDuration = CurrentWeatherDuration;
+	State.CurrentWeatherTargetDuration = CurrentWeatherTargetDuration;
+
+	return State;
 }
 
 EWeatherType AWorldManager::GetNextWeather()

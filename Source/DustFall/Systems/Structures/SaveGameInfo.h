@@ -17,18 +17,3 @@ struct FSaveGameInfo
 	UPROPERTY(BlueprintReadOnly)
 	UTexture2D* SaveScreenshot;
 };
-
-USTRUCT(BlueprintType)
-struct FNewSaveGameInfo
-{
-	GENERATED_BODY()
-
-	UPROPERTY(BlueprintReadOnly)
-	FString SaveSlotName;
-
-	UPROPERTY(BlueprintReadOnly)
-	int32 PlayerLevel;
-
-	UPROPERTY(BlueprintReadOnly)
-	FVector PlayerLocation;
-};
