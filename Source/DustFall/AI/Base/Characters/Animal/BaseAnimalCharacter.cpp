@@ -18,8 +18,16 @@
 ABaseAnimalCharacter::ABaseAnimalCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
+	bUseControllerRotationYaw = false;
 
 	AIControllerClass = ABaseAnimalController::StaticClass();
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	if (auto MovementComponent = GetCharacterMovement()) {
+		MovementComponent->bOrientRotationToMovement = true;
+		MovementComponent->RotationRate = FRotator(0.f, 180.f, 0.f);
+	}
+	
 	AbilityComponent = CreateDefaultSubobject<UAIAbilityComponent>(TEXT("AbilityComponent"));
 	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
 	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
@@ -39,10 +47,11 @@ void ABaseAnimalCharacter::BeginPlay()
 	if (GetController())
 		Blackboard = Cast<AAIController>(GetController())->GetBlackboardComponent();
 	
-	if (Blackboard)
+	if (Blackboard) {
+		Blackboard->SetValueAsFloat("PatrolRadius", AnimalDataAsset->PatrolRadius);
 		Blackboard->SetValueAsEnum("AnimalType",
-			static_cast<uint8>(TeamToAnimal(AnimalDataAsset ? AnimalDataAsset->TeamType : ETeamType::None))
-		);
+			static_cast<uint8>(TeamToAnimal(AnimalDataAsset ? AnimalDataAsset->TeamType : ETeamType::None)));
+	}
 
 	if (!AnimalDataAsset || !PerceptionComponent || !DetectSphere) return;
 	
@@ -63,6 +72,9 @@ void ABaseAnimalCharacter::BeginPlay()
 	DetectSphere->OnComponentBeginOverlap.AddDynamic(this, &ABaseAnimalCharacter::OnDetectOverlap);
 
 	DetectSphere->SetSphereRadius(AnimalDataAsset->DetectRadius);
+
+	if (auto MovementComponent = GetCharacterMovement())
+		MovementComponent->MaxWalkSpeed = AnimalDataAsset->WalkSpeed;
 }
 
 void ABaseAnimalCharacter::HandleSprint_Implementation(bool bIsSprint)

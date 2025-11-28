@@ -4,6 +4,11 @@
 #include "BTTask_MoveToRandomPatrolPoint.h"
 #include "AIController.h"
 #include "NavigationSystem.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "Components/BoxComponent.h"
+#include "DustFall/AI/Base/Interfaces/AIHabitatInterface.h"
+#include "DustFall/AI/HabitatZone/AIHabitatZone.h"
+#include "Kismet/GameplayStatics.h"
 
 
 UBTTask_MoveToRandomPatrolPoint::UBTTask_MoveToRandomPatrolPoint()
@@ -15,43 +20,68 @@ UBTTask_MoveToRandomPatrolPoint::UBTTask_MoveToRandomPatrolPoint()
 
 EBTNodeResult::Type UBTTask_MoveToRandomPatrolPoint::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	auto AIController = OwnerComp.GetAIOwner();
-	auto AIPawn = AIController ? AIController->GetPawn() : nullptr;
-	if (!AIPawn || !AIController) return EBTNodeResult::Failed;
+    AAIController* AIController = OwnerComp.GetAIOwner();
+    if (!AIController) return EBTNodeResult::Failed;
 
-	auto NavigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
-	if (!NavigationSystem) return EBTNodeResult::Failed;
-	
-	FNavLocation RandomLocation;
-	if (NavigationSystem->GetRandomReachablePointInRadius(AIPawn->GetActorLocation(), 800.f, RandomLocation))
-	{
-		CachedOwnerComp = &OwnerComp;
-		
-		FAIRequestID MoveRequestID = AIController->MoveToLocation(
-			RandomLocation.Location, 
-			5.0f, 
-			true);
-		
-		if (MoveRequestID.IsValid())
-		{
-			AIController->ReceiveMoveCompleted.AddDynamic(this, &UBTTask_MoveToRandomPatrolPoint::OnMoveCompleted);
-			return EBTNodeResult::InProgress;
-		}
-	}
+    APawn* Pawn = AIController->GetPawn();
+    if (!Pawn) return EBTNodeResult::Failed;
 
-	return EBTNodeResult::Failed;
-}
+    UBlackboardComponent* BB = OwnerComp.GetBlackboardComponent();
+    if (!BB) return EBTNodeResult::Failed;
 
-void UBTTask_MoveToRandomPatrolPoint::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)
-{
-	if (!CachedOwnerComp) return;
+    auto NavSystem = UNavigationSystemV1::GetCurrent(Pawn->GetWorld());
+    if (!NavSystem) return EBTNodeResult::Failed;
 
-	if (Result == EPathFollowingResult::Success)
-	{
-		FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
-	} else {
-		FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Failed);
-	}
+    FVector ResultLocation = FVector::ZeroVector;
+    bool bFound = false;
 
-	CachedOwnerComp = nullptr;
+    if (AAIHabitatZone* Zone = IAIHabitatInterface::Execute_GetHabitatZone(Pawn); Zone && Zone->ZoneBox)
+    {
+        UBoxComponent* ZoneBox = Zone->ZoneBox;
+        const FVector Origin = ZoneBox->GetComponentLocation();
+        const FVector Extent = ZoneBox->GetScaledBoxExtent();
+        const int MaxAttempts = 40;
+
+        for (int i = 0; i < MaxAttempts; ++i)
+        {
+            FVector RandomPoint(
+                FMath::FRandRange(-Extent.X, Extent.X),
+                FMath::FRandRange(-Extent.Y, Extent.Y),
+                FMath::FRandRange(-Extent.Z, Extent.Z)
+            );
+            RandomPoint += Origin;
+
+            FNavLocation NavLoc;
+            if (NavSystem->ProjectPointToNavigation(RandomPoint, NavLoc))
+            {
+                if (ZoneBox->Bounds.GetBox().IsInsideOrOn(NavLoc.Location))
+                {
+                    ResultLocation = NavLoc.Location;
+                    bFound = true;
+                    break;
+                }
+            }
+        }
+    }
+    
+    if (!bFound)
+    {
+        FNavLocation NavLoc;
+        if (NavSystem->GetRandomReachablePointInRadius(
+            Pawn->GetActorLocation(),
+            BB->GetValueAsFloat("PatrolRadius"),
+            NavLoc)
+        ) {
+            ResultLocation = NavLoc.Location;
+            bFound = true;
+        }
+    }
+    
+    if (bFound)
+    {
+        BB->SetValueAsVector("PatrolPoint", ResultLocation);
+        return EBTNodeResult::Succeeded;
+    }
+
+    return EBTNodeResult::Failed;
 }

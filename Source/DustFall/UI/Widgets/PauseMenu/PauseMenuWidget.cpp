@@ -9,7 +9,7 @@
 void UPauseMenuWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-
+ 
 	if (Btn_ExitGame)
 	{
 		Btn_ExitGame->OnClicked.AddDynamic(this, &UPauseMenuWidget::OnExitGameClicked);

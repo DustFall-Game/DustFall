@@ -19,7 +19,7 @@ void ABaseAnimalController::OnConstruction(const FTransform& Transform)
 	if (auto LoadedBT = Cast<UBehaviorTree>(StaticLoadObject(
 		UBehaviorTree::StaticClass(),
 		nullptr,
-		TEXT("/Game/AI/BehaviorTrees/BT_AnimalBase.BT_AnimalBase"))))
+		TEXT("/Game/Blueprints/AI/BehaviorTrees/BT_AnimalBase.BT_AnimalBase"))))
 	{
 		RunBehaviorTree(LoadedBT);
 	}

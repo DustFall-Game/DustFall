@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "NavigationSystem.h"
 #include "BehaviorTree/BTTaskNode.h"
+#include "Components/BoxComponent.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "BTTask_MoveToRandomPatrolPoint.generated.h"
 
@@ -20,11 +22,4 @@ public:
 
 protected:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-
-	UFUNCTION()
-	virtual void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result);
-
-private:
-	UPROPERTY()
-	UBehaviorTreeComponent* CachedOwnerComp;
 };

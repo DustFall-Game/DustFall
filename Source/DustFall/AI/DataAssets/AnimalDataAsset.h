@@ -54,6 +54,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Perception")
 	float DetectRadius = 300.f;
 
+	/** Радиус в котором будет искаться точка для патрулированния */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Perception")
+	float PatrolRadius = 300.f;
+
 	/** Максимальная зона где может увидеть */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Perception Sight")
 	float SightRadius = 2000.f;

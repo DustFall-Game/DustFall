@@ -17,8 +17,8 @@ void UAIAbilityComponent::BeginPlay()
 void UAIAbilityComponent::Server_Die()
 {
 	Super::Server_Die();
-
-	if (!AIController && !CharacterRef) return;
+	
+	if (!AIController || !CharacterRef) return;
 	
 	if (auto Brain = AIController->GetBrainComponent())
 		Brain->StopLogic("Died");
@@ -27,4 +27,14 @@ void UAIAbilityComponent::Server_Die()
 		Perception->Deactivate();
 
 	AIController->UnPossess();
+
+	FTimerHandle Handle;
+	GetWorld()->GetTimerManager().SetTimer(
+		Handle,
+		[this]
+		{
+			CharacterRef->Destroy();
+		},
+		45.f,
+		false);
 }

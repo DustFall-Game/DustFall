@@ -6,6 +6,7 @@
 #include "GenericTeamAgentInterface.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Components/SphereComponent.h"
+#include "DustFall/AI/Base/Interfaces/AIHabitatInterface.h"
 #include "DustFall/AI/Base/Interfaces/AIMovementInterface.h"
 #include "DustFall/AI/DataAssets/AnimalDataAsset.h"
 #include "DustFall/AI/Enums/AnimalType.h"
@@ -21,7 +22,7 @@ class UAIPerceptionComponent;
 class UAIAbilityComponent;
 
 UCLASS()
-class DUSTFALL_API ABaseAnimalCharacter : public ACharacter, public IGenericTeamAgentInterface, public IAIMovementInterface
+class DUSTFALL_API ABaseAnimalCharacter : public ACharacter, public IGenericTeamAgentInterface, public IAIMovementInterface, public IAIHabitatInterface
 {
 	GENERATED_BODY()
 
@@ -30,6 +31,8 @@ public:
 	
 	/** Interfaces */
 	virtual void HandleSprint_Implementation(bool bIsSprint) override;
+	virtual void SetHabitatZone_Implementation(AAIHabitatZone* Zone) override { HabitatZone = Zone; };
+	virtual AAIHabitatZone* GetHabitatZone_Implementation() override { return HabitatZone; };
 
 protected:
 	virtual void BeginPlay() override;
@@ -72,4 +75,7 @@ protected:
 
 private:
 	static EAnimalType TeamToAnimal(ETeamType Team);
+	
+	UPROPERTY()
+	AAIHabitatZone* HabitatZone;
 };

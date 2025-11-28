@@ -16,19 +16,19 @@ UBTService_CheckActorDistance::UBTService_CheckActorDistance()
 void UBTService_CheckActorDistance::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
-
+	
 	auto AIController = OwnerComp.GetAIOwner();
 	if (!AIController) return;
-
+	
 	auto AIPawn = AIController->GetPawn();
 	if (!AIPawn) return;
-
+	
 	auto Blackboard = AIController->GetBlackboardComponent();
 	if (!Blackboard) return;
-
+	
 	auto Character = Cast<ACharacter>(Blackboard->GetValueAsObject(TargetActorKey.SelectedKeyName));
 	if (!Character) return;
-
+	
 	float DistanceToTarget = AIPawn->GetDistanceTo(Character);
 	Blackboard->SetValueAsFloat(DistanceToTargetKey.SelectedKeyName, DistanceToTarget);
 }
