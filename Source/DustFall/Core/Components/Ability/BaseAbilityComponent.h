@@ -18,6 +18,9 @@ class DUSTFALL_API UBaseAbilityComponent : public UActorComponent, public IDamag
 public:
 	UBaseAbilityComponent();
 
+	/** Getters */
+	virtual float GetHealth() { return Health; };
+
 	/** Delegats */
 	UPROPERTY(BlueprintAssignable)
 	FOnDamageTaken OnDamageTaken;

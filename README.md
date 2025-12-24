@@ -187,3 +187,29 @@ private:
 	float Stamina;
 };
 ```
+ 
+ # 8. Fixed Naming / Gameplay Identifiers
+
+Данный раздел описывает **строго зафиксированные имена**, которые используются в C++, Blueprint, Animation, AI и DataAssets.  
+**Переименование этих элементов без изменения кода запрещено.**
+
+Цель раздела:
+- исключить ошибки из-за `FName("WrongName")`
+- синхронизировать программистов, аниматоров и дизайнеров
+- зафиксировать gameplay-критичные идентификаторы
+
+---
+
+## 8.1 Skeletal Mesh Sockets
+
+```cpp
+// Хорошо
+SKT_Head
+SKT_Rifle
+SKT_Spine
+
+// Плохо
+socket_golova
+sktWeapons
+SOCKET_Spine
+```

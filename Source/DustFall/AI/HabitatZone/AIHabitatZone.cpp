@@ -12,6 +12,7 @@
 AAIHabitatZone::AAIHabitatZone()
 {
     PrimaryActorTick.bCanEverTick = false;
+    bReplicates = true;
 
     ZoneBox = CreateDefaultSubobject<UBoxComponent>(TEXT("ZoneBox"));
     ZoneBox->SetCollisionProfileName(TEXT("Trigger"));
@@ -30,6 +31,8 @@ void AAIHabitatZone::BeginPlay()
 
 void AAIHabitatZone::EnsureSpawnCounts()
 {
+    if (!HasAuthority()) return;
+
     CleanupTrackedList();
     
     TMap<TSubclassOf<APawn>, int32> CurrentCounts;
@@ -61,7 +64,7 @@ void AAIHabitatZone::EnsureSpawnCounts()
 
 APawn* AAIHabitatZone::SpawnOneForEntry(const FSpawnEntry& Entry)
 {
-    if (!Entry.PawnClass) return nullptr;
+    if (!Entry.PawnClass || !HasAuthority()) return nullptr;
     
     UWorld* World = GetWorld();
     if (!World) return nullptr;

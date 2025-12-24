@@ -16,6 +16,9 @@ class DUSTFALL_API UBaseAnimalAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 
+public:
+	virtual void InitializeBlackboard(UBlackboardComponent* BB) { Blackboard = BB; };
+
 protected:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;

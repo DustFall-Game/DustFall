@@ -34,6 +34,22 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Movement")
 	float SprintSpeed = 450.f;
 
+	/** Урон аттаки */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
+	float MeleeDamage;
+
+	/** Дистанция для трейса сферы аттаки */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
+	float MeleeTraceDistance;
+
+	/** Дистанция для трейса нахожденния игрорка */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
+	float MeleeTraceDistanceDetected;
+
+	/** Радиус сферы аттаки*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
+	float MeleeTraceRadius;
+
 	/** Реакция на зрение (видит цель — alert) */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Perception")
 	bool bReactToSight = true;

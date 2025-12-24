@@ -6,9 +6,6 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
-#include "Perception/AIPerceptionComponent.h"
-#include "Perception/AIPerceptionSystem.h"
-#include "Perception/AISense_Damage.h"
 
 
 UBaseAbilityComponent::UBaseAbilityComponent()
@@ -27,13 +24,12 @@ void UBaseAbilityComponent::BeginPlay()
 void UBaseAbilityComponent::TakeDamage_Implementation(float Damage, AActor* Character, FName Bone)
 {
 	Health -= Damage;
+	OnDamageTaken.Broadcast();
 
 	UE_LOG(LogTemp, Warning, TEXT("Health = %f"), Health);
 
 	if (Health <= 0)
 		Server_Die();
-
-	OnDamageTaken.Broadcast();
 }
 
 void UBaseAbilityComponent::Server_Die_Implementation()

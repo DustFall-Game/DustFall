@@ -2,7 +2,6 @@
 
 
 #include "BaseAnimalAnimInstance.h"
-#include "AIController.h"
 #include "KismetAnimationLibrary.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Character.h"
@@ -14,6 +13,8 @@ void UBaseAnimalAnimInstance::NativeInitializeAnimation()
 	Super::NativeInitializeAnimation();
 
 	Character = Cast<ACharacter>(TryGetPawnOwner());
+	if (Character)
+		MaxSprintSpeed = Character->GetCharacterMovement()->MaxWalkSpeed;
 }
 
 void UBaseAnimalAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -21,23 +22,18 @@ void UBaseAnimalAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
 	if (!Character) return;
-	if (!Blackboard)
-	{
-		auto AIController = Cast<AAIController>(Character->GetController());
-		if (!AIController) return;
-		
-		Blackboard = AIController->GetBlackboardComponent();
-		MaxSprintSpeed = Character->GetCharacterMovement()->MaxWalkSpeed;
-	}
 	
 	const FVector Velocity = Character->GetVelocity();
 	const FRotator Rotation = Character->GetControlRotation();
 
 	Speed = Velocity.Length();
 	Direction = UKismetAnimationLibrary::CalculateDirection(Velocity, Rotation);
-	
-	uint8 StateValue = Blackboard->GetValueAsEnum("AnimalState");
-	AnimalState = static_cast<EAnimalState>(StateValue);
+
+	if (Blackboard)
+	{
+		uint8 StateValue = Blackboard->GetValueAsEnum("AnimalState");
+		AnimalState = static_cast<EAnimalState>(StateValue);
+	}
 }
 
 void UBaseAnimalAnimInstance::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const

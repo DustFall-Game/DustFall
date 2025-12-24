@@ -11,6 +11,7 @@
 #include "DustFall/AI/DataAssets/AnimalDataAsset.h"
 #include "DustFall/AI/Enums/AnimalType.h"
 #include "DustFall/AI/Enums/TeamType.h"
+#include "DustFall/Core/Interfaces/AttackerInterface.h"
 #include "GameFramework/Character.h"
 #include "BaseAnimalCharacter.generated.h"
 
@@ -22,7 +23,7 @@ class UAIPerceptionComponent;
 class UAIAbilityComponent;
 
 UCLASS()
-class DUSTFALL_API ABaseAnimalCharacter : public ACharacter, public IGenericTeamAgentInterface, public IAIMovementInterface, public IAIHabitatInterface
+class DUSTFALL_API ABaseAnimalCharacter : public ACharacter, public IGenericTeamAgentInterface, public IAIMovementInterface, public IAIHabitatInterface, public IAttackerInterface
 {
 	GENERATED_BODY()
 
@@ -33,9 +34,11 @@ public:
 	virtual void HandleSprint_Implementation(bool bIsSprint) override;
 	virtual void SetHabitatZone_Implementation(AAIHabitatZone* Zone) override { HabitatZone = Zone; };
 	virtual AAIHabitatZone* GetHabitatZone_Implementation() override { return HabitatZone; };
+	virtual void DoAttackTrace_Implementation(FName DamageSourceBone) override;
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void StartAttack();
 	virtual void GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const override;
 
 	UFUNCTION()
@@ -43,6 +46,12 @@ protected:
 
 	UFUNCTION()
 	virtual void OnDamageTaken();
+
+	UFUNCTION()
+	virtual void OnDetectedTargetActor();
+
+	UFUNCTION()
+	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 	UFUNCTION()
 	void OnDetectOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -67,6 +76,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category="Assets")
 	UAnimalDataAsset* AnimalDataAsset;
+
+	UPROPERTY(EditAnywhere, Category="Assets")
+	UAnimMontage* AttackMontage;
 	
 	virtual FGenericTeamId GetGenericTeamId() const override
 	{
@@ -74,6 +86,7 @@ protected:
 	}
 
 private:
+	bool bIsAttacked;
 	static EAnimalType TeamToAnimal(ETeamType Team);
 	
 	UPROPERTY()
